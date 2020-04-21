@@ -2,10 +2,11 @@ package com.antonitor.gotchat.ui;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.util.Log;
 
 import com.antonitor.gotchat.R;
 import com.firebase.ui.auth.AuthUI;
@@ -19,9 +20,11 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 1;
+    private static final String TAG = MainActivity.class.getCanonicalName();
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
-    private FirebaseUser mUser;
+
+    private MainViewModel mainViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //add viwemodel
+        mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
 
@@ -60,32 +64,36 @@ public class MainActivity extends AppCompatActivity {
             IdpResponse response = IdpResponse.fromResultIntent(data);
 
             if (resultCode == RESULT_OK) {
-                mUser = FirebaseAuth.getInstance().getCurrentUser();
-                Toast.makeText(this, "Hello " + mUser.getPhoneNumber() + " !!", Toast.LENGTH_SHORT).show();
+                mainViewModel.setmUser(FirebaseAuth.getInstance().getCurrentUser());
+                Log.d(TAG, "LOGGED AS " + mainViewModel.getmUser().getPhoneNumber());
             } else {
-                Toast.makeText(this, "Sign in cancelled", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "SIGN_IN FAILED");
                 finish();
             }
         }
     }
 
+
     private void onSingedInInitialize(FirebaseUser user) {
-        mUser = user;
+        mainViewModel.setmUser(user);
+        //TODO add funtionality to this activity when singed
     }
 
     private void onSingedOutCleanup() {
-        mUser = null;
+        mainViewModel.setmUser(null);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        //register AuthStateListener
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        //Un-register AuthStateListener
         if (mAuthStateListener !=null)
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
     }
