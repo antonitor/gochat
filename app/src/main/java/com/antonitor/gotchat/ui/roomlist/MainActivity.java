@@ -1,8 +1,11 @@
-package com.antonitor.gotchat.ui;
+package com.antonitor.gotchat.ui.roomlist;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +14,7 @@ import android.util.Log;
 import com.antonitor.gotchat.R;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -76,12 +80,21 @@ public class MainActivity extends AppCompatActivity {
 
     private void onSingedInInitialize(FirebaseUser user) {
         mainViewModel.setmUser(user);
-        //TODO add funtionality to this activity when singed
+        startFragmentPageAdapter();
     }
 
     private void onSingedOutCleanup() {
         mainViewModel.setmUser(null);
     }
+
+    private void startFragmentPageAdapter() {
+        ViewPager viewPager = findViewById(R.id.pager);
+        PagerAdapter pagerAdapter = new MainPageAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        TabLayout tabLayout = findViewById(R.id.sliding_tabs);
+        tabLayout.setupWithViewPager(viewPager);
+        viewPager.setAdapter(pagerAdapter);
+    }
+
 
     @Override
     protected void onResume() {

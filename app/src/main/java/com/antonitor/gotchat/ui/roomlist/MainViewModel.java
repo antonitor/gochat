@@ -1,4 +1,4 @@
-package com.antonitor.gotchat.ui;
+package com.antonitor.gotchat.ui.roomlist;
 
 import com.google.firebase.auth.FirebaseUser;
 
