@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.antonitor.gotchat.R;
+import com.antonitor.gotchat.sync.Repository;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.tabs.TabLayout;
@@ -25,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 1;
     private static final String TAG = MainActivity.class.getCanonicalName();
+
+    private Repository mRepository;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
@@ -34,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Initialize repository
+        mRepository = Repository.getInstance();
 
         //add viwemodel
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
@@ -68,8 +74,8 @@ public class MainActivity extends AppCompatActivity {
             IdpResponse response = IdpResponse.fromResultIntent(data);
 
             if (resultCode == RESULT_OK) {
-                mainViewModel.setmUser(FirebaseAuth.getInstance().getCurrentUser());
-                Log.d(TAG, "LOGGED AS " + mainViewModel.getmUser().getPhoneNumber());
+                mRepository.setmUser(FirebaseAuth.getInstance().getCurrentUser());
+                Log.d(TAG, "LOGGED AS " + mRepository.getmUser().getPhoneNumber());
             } else {
                 Log.e(TAG, "SIGN_IN FAILED");
                 finish();
@@ -79,17 +85,18 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void onSingedInInitialize(FirebaseUser user) {
-        mainViewModel.setmUser(user);
+        mRepository.setmUser(user);
         startFragmentPageAdapter();
     }
 
     private void onSingedOutCleanup() {
-        mainViewModel.setmUser(null);
+        mRepository.setmUser(null);
     }
 
     private void startFragmentPageAdapter() {
         ViewPager viewPager = findViewById(R.id.pager);
-        PagerAdapter pagerAdapter = new MainPageAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        PagerAdapter pagerAdapter = new MainPageAdapter(getSupportFragmentManager(),
+                FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         TabLayout tabLayout = findViewById(R.id.sliding_tabs);
         tabLayout.setupWithViewPager(viewPager);
         viewPager.setAdapter(pagerAdapter);

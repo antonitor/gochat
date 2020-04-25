@@ -2,6 +2,7 @@ package com.antonitor.gotchat.ui.roomlist;
 
 import android.os.Bundle;
 
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.antonitor.gotchat.R;
+import com.antonitor.gotchat.databinding.FragmentTrendigListBinding;
 
 import java.util.Objects;
 
@@ -21,7 +23,8 @@ import java.util.Objects;
  */
 public class RoomsFragmentTrending extends Fragment {
 
-    ViewModel viewModel;
+    private ViewModel viewModel;
+    private FragmentTrendigListBinding mDataBinding;
 
     public RoomsFragmentTrending() {
         // Required empty public constructor
@@ -40,10 +43,8 @@ public class RoomsFragmentTrending extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_trendig_list, container, false);
-        viewModel = new ViewModelProvider(Objects.requireNonNull(getActivity())).get(MainViewModel.class);
-
-
-        return view;
+        mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_trendig_list, container, false);
+        viewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
+        return mDataBinding.getRoot();
     }
 }
