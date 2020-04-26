@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.antonitor.gotchat.R;
+import com.antonitor.gotchat.sync.FirebaseGoChatData;
 import com.antonitor.gotchat.sync.Repository;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
@@ -74,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
             IdpResponse response = IdpResponse.fromResultIntent(data);
 
             if (resultCode == RESULT_OK) {
-                mRepository.setmUser(FirebaseAuth.getInstance().getCurrentUser());
+                FirebaseGoChatData.getInstance().setFirebaseUser(FirebaseAuth.getInstance().getCurrentUser());
                 Log.d(TAG, "LOGGED AS " + mRepository.getmUser().getPhoneNumber());
             } else {
                 Log.e(TAG, "SIGN_IN FAILED");
@@ -85,8 +86,11 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void onSingedInInitialize(FirebaseUser user) {
-        mRepository.setmUser(user);
+
+        FirebaseGoChatData.getInstance().setFirebaseUser(user);
+        Log.d(TAG, "LOGGED AS " + FirebaseGoChatData.getInstance().getFirebaseUser().getPhoneNumber());
         startFragmentPageAdapter();
+
     }
 
     private void onSingedOutCleanup() {

@@ -6,6 +6,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,19 +14,14 @@ import android.view.ViewGroup;
 
 import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.FragmentFollowingListBinding;
+import com.antonitor.gotchat.sync.FirebaseGoChatData;
 
-import java.util.Objects;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link RoomsFragmentFollowing#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class RoomsFragmentFollowing extends Fragment {
+public class RoomsFragmentFollowing extends Fragment implements MainRecyclerViewAdapter.RoomOnClickListener {
 
     private ViewModel viewModel;
     private FragmentFollowingListBinding mDataBinding;
-
+    private MainRecyclerViewAdapter recyclerViewAdapter;
 
     public RoomsFragmentFollowing() {
         // Required empty public constructor
@@ -46,6 +42,26 @@ public class RoomsFragmentFollowing extends Fragment {
                              Bundle savedInstanceState) {
         mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_following_list, container, false);
         viewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
+
+        setUpRecyclerView();
+
         return mDataBinding.getRoot();
+    }
+
+    private void setUpRecyclerView(){
+        MainRecyclerViewAdapter recyclerViewAdapter = new MainRecyclerViewAdapter(
+                FirebaseGoChatData.getInstance().getFollowedChatRoomListOptions(),
+                this);
+        mDataBinding.followingRecyclerview.setAdapter(recyclerViewAdapter);
+        LinearLayoutManager manager = new LinearLayoutManager(getActivity());
+        //manager.setReverseLayout(true);
+        //manager.setStackFromEnd(true);
+        mDataBinding.followingRecyclerview.setLayoutManager(manager);
+        recyclerViewAdapter.startListening();
+    }
+
+    @Override
+    public void onRoomClicked() {
+
     }
 }
