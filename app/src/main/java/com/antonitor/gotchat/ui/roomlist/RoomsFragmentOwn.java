@@ -14,14 +14,16 @@ import android.view.ViewGroup;
 
 import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.FragmentOwnRoomsBinding;
-import com.antonitor.gotchat.sync.FirebaseGoChatData;
+import com.antonitor.gotchat.sync.FBRDatabaseData;
+
+import java.util.Random;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link RoomsFragmentOwn#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RoomsFragmentOwn extends Fragment implements MainRecyclerViewAdapter.RoomOnClickListener {
+public class RoomsFragmentOwn extends Fragment implements MainRecyclerViewAdapter.OnCloseClickListener{
 
     private ViewModel viewModel;
     private FragmentOwnRoomsBinding mDataBinding;
@@ -54,26 +56,25 @@ public class RoomsFragmentOwn extends Fragment implements MainRecyclerViewAdapte
         mDataBinding.addFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FirebaseGoChatData.getInstance().newChatRoom("123", "WEEP", "topic", null);
+                int rand = new Random().nextInt(100);
+                String roomID = "" + rand;
+                String title = "Room " + rand;
+                String topic = "topic " + rand;
+                String photoUrl = null;
+                FBRDatabaseData.getInstance().newChatRoom(roomID, title, topic, photoUrl);
             }
         });
     }
 
     private void setUpRecyclerView(){
         recyclerViewAdapter = new MainRecyclerViewAdapter(
-                FirebaseGoChatData.getInstance().getOwnChatRoomListOptions(),
-                this);
+                FBRDatabaseData.getInstance().getOwnChatRoomListOptions(), this);
         mDataBinding.ownRecyclerview.setAdapter(recyclerViewAdapter);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         //manager.setReverseLayout(true);
         //manager.setStackFromEnd(true);
         mDataBinding.ownRecyclerview.setLayoutManager(manager);
         recyclerViewAdapter.startListening();
-    }
-
-    @Override
-    public void onRoomClicked() {
-
     }
 
     @Override
@@ -84,4 +85,8 @@ public class RoomsFragmentOwn extends Fragment implements MainRecyclerViewAdapte
     }
 
 
+    @Override
+    public void onCloseClicked() {
+
+    }
 }

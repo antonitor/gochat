@@ -12,8 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.antonitor.gotchat.R;
-import com.antonitor.gotchat.sync.FirebaseGoChatData;
-import com.antonitor.gotchat.sync.Repository;
+import com.antonitor.gotchat.sync.FBRDatabaseData;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.tabs.TabLayout;
@@ -28,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 1;
     private static final String TAG = MainActivity.class.getCanonicalName();
 
-    private Repository mRepository;
+    private FBRDatabaseData goChatData;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
@@ -40,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //Initialize repository
-        mRepository = Repository.getInstance();
+        goChatData = FBRDatabaseData.getInstance();
 
         //add viwemodel
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
@@ -75,8 +74,8 @@ public class MainActivity extends AppCompatActivity {
             IdpResponse response = IdpResponse.fromResultIntent(data);
 
             if (resultCode == RESULT_OK) {
-                FirebaseGoChatData.getInstance().setFirebaseUser(FirebaseAuth.getInstance().getCurrentUser());
-                Log.d(TAG, "LOGGED AS " + mRepository.getmUser().getPhoneNumber());
+                goChatData.setFirebaseUser(FirebaseAuth.getInstance().getCurrentUser());
+                Log.d(TAG, "LOGGED AS " + goChatData.getFirebaseUser().getPhoneNumber());
             } else {
                 Log.e(TAG, "SIGN_IN FAILED");
                 finish();
@@ -87,14 +86,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void onSingedInInitialize(FirebaseUser user) {
 
-        FirebaseGoChatData.getInstance().setFirebaseUser(user);
-        Log.d(TAG, "LOGGED AS " + FirebaseGoChatData.getInstance().getFirebaseUser().getPhoneNumber());
+        FBRDatabaseData.getInstance().setFirebaseUser(user);
+        Log.d(TAG, "LOGGED AS " + FBRDatabaseData.getInstance().getFirebaseUser().getPhoneNumber());
         startFragmentPageAdapter();
 
     }
 
     private void onSingedOutCleanup() {
-        mRepository.setmUser(null);
+        goChatData.setFirebaseUser(null);
     }
 
     private void startFragmentPageAdapter() {

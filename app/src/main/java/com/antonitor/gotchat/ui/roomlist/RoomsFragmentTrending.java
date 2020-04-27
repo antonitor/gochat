@@ -14,14 +14,14 @@ import android.view.ViewGroup;
 
 import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.FragmentTrendigListBinding;
-import com.antonitor.gotchat.sync.FirebaseGoChatData;
+import com.antonitor.gotchat.sync.FBRDatabaseData;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link RoomsFragmentTrending#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RoomsFragmentTrending extends Fragment implements MainRecyclerViewAdapter.RoomOnClickListener{
+public class RoomsFragmentTrending extends Fragment implements MainRecyclerViewAdapter.OnFollowClickListener{
 
     private ViewModel viewModel;
     private FragmentTrendigListBinding mDataBinding;
@@ -54,7 +54,7 @@ public class RoomsFragmentTrending extends Fragment implements MainRecyclerViewA
 
     private void setUpRecyclerView(){
         recyclerViewAdapter = new MainRecyclerViewAdapter(
-                FirebaseGoChatData.getInstance().getTrendingChatRoomListOptions(),
+                FBRDatabaseData.getInstance().getTrendingChatRoomListOptions(),
                 this);
         mDataBinding.trendingRecyclerview.setAdapter(recyclerViewAdapter);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
@@ -64,8 +64,9 @@ public class RoomsFragmentTrending extends Fragment implements MainRecyclerViewA
         recyclerViewAdapter.startListening();
     }
 
+
     @Override
-    public void onRoomClicked() {
+    public void onFollowClicked() {
 
     }
 }

@@ -15,16 +15,36 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class MainRecyclerViewAdapter extends FirebaseRecyclerAdapter {
 
-    private RoomOnClickListener onClickListener;
+    private OnFollowClickListener onClickListener;
+    private OnUnfollowClickListener onUnfollowClickListener;
+    private OnCloseClickListener onCloseClickListener;
     private ItemRoomBinding itemBinding;
 
-    public interface RoomOnClickListener {
-        void onRoomClicked();
+    public interface OnFollowClickListener {
+        void onFollowClicked();
     }
 
-    public MainRecyclerViewAdapter(@NonNull FirebaseRecyclerOptions options, RoomOnClickListener onClickListener) {
+    public interface OnUnfollowClickListener {
+        void onUnfollowClicked();
+    }
+
+    public interface OnCloseClickListener {
+        void onCloseClicked();
+    }
+
+    public MainRecyclerViewAdapter(@NonNull FirebaseRecyclerOptions options, OnFollowClickListener onClickListener) {
         super(options);
         this.onClickListener = onClickListener;
+    }
+
+    public MainRecyclerViewAdapter(@NonNull FirebaseRecyclerOptions options, OnUnfollowClickListener onClickListener) {
+        super(options);
+        this.onUnfollowClickListener = onClickListener;
+    }
+
+    public MainRecyclerViewAdapter(@NonNull FirebaseRecyclerOptions options, OnCloseClickListener onCloseClickListener) {
+        super(options);
+        this.onCloseClickListener = onCloseClickListener;
     }
 
     @Override
