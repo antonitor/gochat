@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 
 import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.FragmentOwnRoomsBinding;
+import com.antonitor.gotchat.model.ChatRoom;
 import com.antonitor.gotchat.sync.FBRDatabaseData;
 
 import java.util.Random;
@@ -23,11 +24,11 @@ import java.util.Random;
  * Use the {@link RoomsFragmentOwn#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RoomsFragmentOwn extends Fragment implements MainRecyclerViewAdapter.OnCloseClickListener{
+public class RoomsFragmentOwn extends Fragment implements RecyclerViewAdapterOwn.OnCloseClickListener{
 
     private ViewModel viewModel;
     private FragmentOwnRoomsBinding mDataBinding;
-    private MainRecyclerViewAdapter recyclerViewAdapter;
+    private RecyclerViewAdapterOwn recyclerViewAdapter;
 
     public RoomsFragmentOwn() {}
 
@@ -67,7 +68,7 @@ public class RoomsFragmentOwn extends Fragment implements MainRecyclerViewAdapte
     }
 
     private void setUpRecyclerView(){
-        recyclerViewAdapter = new MainRecyclerViewAdapter(
+        recyclerViewAdapter = new RecyclerViewAdapterOwn(
                 FBRDatabaseData.getInstance().getOwnChatRoomListOptions(), this);
         mDataBinding.ownRecyclerview.setAdapter(recyclerViewAdapter);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
@@ -86,7 +87,7 @@ public class RoomsFragmentOwn extends Fragment implements MainRecyclerViewAdapte
 
 
     @Override
-    public void onCloseClicked() {
-
+    public void onCloseClicked(ChatRoom room) {
+        FBRDatabaseData.getInstance().removeChatRoom(room.getId());
     }
 }

@@ -1,6 +1,7 @@
 package com.antonitor.gotchat.ui.roomlist;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.antonitor.gotchat.R;
@@ -13,43 +14,28 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class MainRecyclerViewAdapter extends FirebaseRecyclerAdapter {
+public class RecyclerViewAdapterTrending extends FirebaseRecyclerAdapter {
 
     private OnFollowClickListener onClickListener;
-    private OnUnfollowClickListener onUnfollowClickListener;
-    private OnCloseClickListener onCloseClickListener;
     private ItemRoomBinding itemBinding;
 
     public interface OnFollowClickListener {
-        void onFollowClicked();
+        void onFollowClicked(ChatRoom room);
     }
 
-    public interface OnUnfollowClickListener {
-        void onUnfollowClicked();
-    }
-
-    public interface OnCloseClickListener {
-        void onCloseClicked();
-    }
-
-    public MainRecyclerViewAdapter(@NonNull FirebaseRecyclerOptions options, OnFollowClickListener onClickListener) {
+    public RecyclerViewAdapterTrending(@NonNull FirebaseRecyclerOptions options, OnFollowClickListener onClickListener) {
         super(options);
         this.onClickListener = onClickListener;
     }
 
-    public MainRecyclerViewAdapter(@NonNull FirebaseRecyclerOptions options, OnUnfollowClickListener onClickListener) {
-        super(options);
-        this.onUnfollowClickListener = onClickListener;
-    }
-
-    public MainRecyclerViewAdapter(@NonNull FirebaseRecyclerOptions options, OnCloseClickListener onCloseClickListener) {
-        super(options);
-        this.onCloseClickListener = onCloseClickListener;
-    }
-
     @Override
-    protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, @NonNull Object model) {
-        ((RoomViewHolder) holder).bind((ChatRoom)model);
+    protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder,
+                                    int position, @NonNull Object model) {
+        ChatRoom room = (ChatRoom) model;
+        RoomViewHolder roomViewHolder = (RoomViewHolder) holder;
+        roomViewHolder.bind(room);
+        roomViewHolder.itemBinding.followButton
+                .setOnClickListener(view -> onClickListener.onFollowClicked(room));
     }
 
     @NonNull
@@ -73,7 +59,6 @@ public class MainRecyclerViewAdapter extends FirebaseRecyclerAdapter {
             itemBinding.setChatroom(room);
             itemBinding.executePendingBindings();
         }
-
     }
 
 }

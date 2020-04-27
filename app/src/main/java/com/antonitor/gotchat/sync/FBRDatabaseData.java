@@ -89,7 +89,9 @@ public class FBRDatabaseData {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                 userChatRooms.getOwnChatRooms().remove(roomID);
+                userChatRooms.getFollowedChatRooms().remove(roomID);
                 userChatsReference.child(userUid).child("ownChatRooms").child(roomID).removeValue();
+                userChatsReference.child(userUid).child("followedChatRooms").child(roomID).removeValue();
             }
         });
     }

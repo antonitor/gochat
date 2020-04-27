@@ -9,4 +9,5 @@
     <string name="cd_chat_room_icon">Chat  room image</string>
     <string name="close">CLOSE</string>
     <string name="people_count_icon">People count icon</string>
+    <string name="unfollow">UNFOLLOW</string>
 </resources>
