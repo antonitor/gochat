@@ -2,11 +2,6 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
-    <data>
-        <variable name="chatroom" type="com.antonitor.gotchat.model.ChatRoom"/>
-    </data>
-
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -102,10 +97,10 @@
             android:layout_height="72dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:background="@drawable/ic_photo_black_24dp"
             android:contentDescription="@string/cd_chat_room_icon"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:roomImage="@{image}"/>
 
         <View
             android:id="@+id/view2"
@@ -119,4 +114,9 @@
             app:layout_constraintStart_toStartOf="@+id/chatroom_image" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <data>
+        <variable name="chatroom" type="com.antonitor.gotchat.model.ChatRoom"/>
+        <variable name="image" type="String" />
+    </data>
 </layout>

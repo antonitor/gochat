@@ -24,7 +24,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int RC_SIGN_IN = 1;
+    public static final int RC_NEW_CHAT_ROOM = 2331;
+    private static final int RC_SIGN_IN = 1341;
     private static final String TAG = MainActivity.class.getCanonicalName();
 
     private FBRDatabaseData goChatData;

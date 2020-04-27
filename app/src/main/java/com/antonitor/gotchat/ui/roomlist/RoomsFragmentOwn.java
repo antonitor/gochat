@@ -1,5 +1,6 @@
 package com.antonitor.gotchat.ui.roomlist;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.databinding.DataBindingUtil;
@@ -57,12 +58,17 @@ public class RoomsFragmentOwn extends Fragment implements RecyclerViewAdapterOwn
         mDataBinding.addFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent newChatRoomIntent = new Intent(getActivity(), AddNewRoomActivity.class);
+                getActivity().startActivity(newChatRoomIntent);
+                //getActivity().startActivityForResult(newChatRoomIntent, MainActivity.RC_NEW_CHAT_ROOM);
+                /*
                 int rand = new Random().nextInt(100);
                 String roomID = "" + rand;
                 String title = "Room " + rand;
                 String topic = "topic " + rand;
                 String photoUrl = null;
                 FBRDatabaseData.getInstance().newChatRoom(roomID, title, topic, photoUrl);
+                */
             }
         });
     }

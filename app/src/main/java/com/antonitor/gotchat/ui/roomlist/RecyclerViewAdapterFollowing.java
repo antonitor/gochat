@@ -5,7 +5,6 @@ import android.view.ViewGroup;
 
 import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.FollowedRoomBinding;
-import com.antonitor.gotchat.databinding.ItemRoomBinding;
 import com.antonitor.gotchat.model.ChatRoom;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -34,6 +33,7 @@ public class RecyclerViewAdapterFollowing extends FirebaseRecyclerAdapter {
         ChatRoom room = (ChatRoom) model;
         RoomViewHolder roomViewHolder = (RoomViewHolder) holder;
         roomViewHolder.bind(room);
+        roomViewHolder.itemBinding.setImage(room.getImageUrl());
         roomViewHolder.itemBinding.followButton
                 .setOnClickListener(view -> onClickListener.onUnfollowClicked(room));
     }

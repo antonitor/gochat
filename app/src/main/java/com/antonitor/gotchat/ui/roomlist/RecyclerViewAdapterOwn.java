@@ -34,6 +34,7 @@ public class RecyclerViewAdapterOwn extends FirebaseRecyclerAdapter {
         ChatRoom room = (ChatRoom) model;
         RoomViewHolder roomViewHolder = (RoomViewHolder) holder;
         roomViewHolder.bind(room);
+        roomViewHolder.itemBinding.setImage(room.getImageUrl());
         roomViewHolder.itemBinding.followButton
                 .setOnClickListener(view -> onCloseClickListener.onCloseClicked(room));
     }

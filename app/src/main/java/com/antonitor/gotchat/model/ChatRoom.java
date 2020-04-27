@@ -1,9 +1,15 @@
 package com.antonitor.gotchat.model;
 
+import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ServerValue;
 
 import java.util.HashMap;
+
+import androidx.databinding.BindingAdapter;
 
 
 public class ChatRoom {
@@ -83,5 +89,12 @@ public class ChatRoom {
 
     public void setActiveUsers(HashMap<String, FirebaseUser> activeUsers) {
         this.activeUsers = activeUsers;
+    }
+
+    @BindingAdapter("roomImage")
+    public static void loadImage(ImageView view, String imageUrl) {
+        Glide.with(view.getContext())
+                .load(imageUrl).apply(new RequestOptions().circleCrop())
+                .into(view);
     }
 }

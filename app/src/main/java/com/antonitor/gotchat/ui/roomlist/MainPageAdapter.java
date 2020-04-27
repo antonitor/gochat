@@ -9,7 +9,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 public class MainPageAdapter extends FragmentPagerAdapter {
 
     private static final int NUM_ITEMS = 3;
-    private String[] tabTitles = new String[]{"Top Rated", "Last Added", "Favorites"};
+    private String[] tabTitles = new String[]{"TRENDING", "FOLLOWINNG", "OWNER"};
 
     public MainPageAdapter(@NonNull FragmentManager fm, int behavior) {
         super(fm, behavior);
@@ -38,6 +38,6 @@ public class MainPageAdapter extends FragmentPagerAdapter {
     @Nullable
     @Override
     public CharSequence getPageTitle(int position) {
-        return super.getPageTitle(position);
+        return tabTitles[position];
     }
 }

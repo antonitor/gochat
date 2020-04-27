@@ -10,4 +10,14 @@
     <string name="close">CLOSE</string>
     <string name="people_count_icon">People count icon</string>
     <string name="unfollow">UNFOLLOW</string>
+    <string name="hint_chat_room_here">Chat Room Name here</string>
+    <string name="hint_enter_topic">Enter chat room tópic here</string>
+    <string name="add">ADD</string>
+    <string name="cancell">CANCELL</string>
+    <string name="upload_picture">Upload picture</string>
+    <string name="take_a_new_picture">Take a new picture</string>
+    <string name="chat_room_image">Chat room image</string>
+    <string name="extra_new_image">extra_new_image</string>
+    <string name="extra_new_chatroom">extra_new_chat_room</string>
+    <string name="extra_new_topic">extra_new_chatroom_topic</string>
 </resources>
