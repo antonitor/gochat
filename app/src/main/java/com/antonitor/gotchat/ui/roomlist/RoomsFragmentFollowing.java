@@ -2,6 +2,7 @@ package com.antonitor.gotchat.ui.roomlist;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModel;
@@ -17,6 +18,8 @@ import com.antonitor.gotchat.databinding.FragmentFollowingListBinding;
 import com.antonitor.gotchat.model.ChatRoom;
 import com.antonitor.gotchat.sync.FBRDatabaseData;
 
+import java.util.Objects;
+
 
 public class RoomsFragmentFollowing extends Fragment implements RecyclerViewAdapterFollowing.OnUnfollowClickListener {
 
@@ -28,9 +31,8 @@ public class RoomsFragmentFollowing extends Fragment implements RecyclerViewAdap
         // Required empty public constructor
     }
 
-    public static RoomsFragmentFollowing newInstance() {
-        RoomsFragmentFollowing fragment = new RoomsFragmentFollowing();
-        return fragment;
+    static RoomsFragmentFollowing newInstance() {
+        return new RoomsFragmentFollowing();
     }
 
     @Override
@@ -39,10 +41,10 @@ public class RoomsFragmentFollowing extends Fragment implements RecyclerViewAdap
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_following_list, container, false);
-        viewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
+        viewModel = new ViewModelProvider(Objects.requireNonNull(getActivity())).get(MainViewModel.class);
 
         setUpRecyclerView();
 
@@ -63,6 +65,6 @@ public class RoomsFragmentFollowing extends Fragment implements RecyclerViewAdap
 
     @Override
     public void onUnfollowClicked(ChatRoom room) {
-
+        FBRDatabaseData.getInstance().unFollowChat(room);
     }
 }

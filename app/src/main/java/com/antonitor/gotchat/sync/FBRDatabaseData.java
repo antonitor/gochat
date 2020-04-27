@@ -74,41 +74,42 @@ public class FBRDatabaseData {
     private void addOwnChatRoom(ChatRoom room) {
         String userUid = firebaseUser.getUid();
         userChatRooms.getOwnChatRooms().put(room.getId(), room);
-        userChatsReference.child(userUid).setValue(userChatRooms);
+        userChatsReference.child(userUid).child("ownChatRooms").setValue(userChatRooms.getOwnChatRooms());
     }
 
     public void addFollowingChat(ChatRoom room) {
         String userUid = firebaseUser.getUid();
         userChatRooms.getFollowedChatRooms().put(room.getId(), room);
-        userChatsReference.child(userUid).setValue(userChatRooms);
+        userChatsReference.child(userUid).child("followedChatRooms").setValue(userChatRooms.getFollowedChatRooms());
+    }
+
+    public void unFollowChat(ChatRoom room) {
+        String userUid = firebaseUser.getUid();
+        userChatRooms.getFollowedChatRooms().remove(room.getId());
+        userChatsReference.child(userUid).child("followedChatRooms").child(room.getId()).removeValue();
     }
 
     public void removeChatRoom(String roomID) {
         String userUid = firebaseUser.getUid();
-        chatroomsReference.child(roomID).removeValue(new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                userChatRooms.getOwnChatRooms().remove(roomID);
-                userChatRooms.getFollowedChatRooms().remove(roomID);
-                userChatsReference.child(userUid).child("ownChatRooms").child(roomID).removeValue();
-                userChatsReference.child(userUid).child("followedChatRooms").child(roomID).removeValue();
-            }
+        chatroomsReference.child(roomID).removeValue((databaseError, databaseReference) -> {
+            userChatRooms.getOwnChatRooms().remove(roomID);
+            userChatRooms.getFollowedChatRooms().remove(roomID);
+            userChatsReference.child(userUid).child("ownChatRooms").child(roomID).removeValue();
+            userChatsReference.child(userUid).child("followedChatRooms").child(roomID).removeValue();
         });
     }
 
 
-
-
-    public Query getTrendingRoomsQuery(){
+    private Query getTrendingRoomsQuery(){
         //return mFirebaseDatabase.getReference().child("/chatrooms").orderByChild("likes_count");
         return mFirebaseDatabase.getReference().child(CHATROOMS_REF);
     }
 
-    public Query getFollowingRoomsQuery(){
+    private Query getFollowingRoomsQuery(){
         return userChatsReference.child(firebaseUser.getUid()).child("followedChatRooms");
     }
 
-    public Query getOwnChatRoomsQuery(){
+    private Query getOwnChatRoomsQuery(){
         return userChatsReference.child(firebaseUser.getUid()).child("ownChatRooms");
     }
 
@@ -143,20 +144,18 @@ public class FBRDatabaseData {
         setUpUserChatRooms();
     }
 
-    private void setUpUserChatRooms(){
+    private void setUpUserChatRooms() {
         userChatsReference.child(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    userChatRooms = dataSnapshot.getValue(User.class);
+                userChatRooms = dataSnapshot.getValue(User.class);
+                if (userChatRooms != null) {
                     if (userChatRooms.getOwnChatRooms() == null)
-                        userChatRooms.setOwnChatRooms(new HashMap<String, ChatRoom>());
-                    Log.d(LOG_TAG, userChatRooms.getOwnChatRooms().toString());
+                        userChatRooms.setOwnChatRooms(new HashMap<>());
                     if (userChatRooms.getFollowedChatRooms() == null)
-                        userChatRooms.setFollowedChatRooms(new HashMap<String, ChatRoom>());
-                    Log.d(LOG_TAG, userChatRooms.getFollowedChatRooms().toString());
+                        userChatRooms.setFollowedChatRooms(new HashMap<>());
                 } else {
-                    userChatRooms = new User(new HashMap<String, ChatRoom>(), new HashMap<String, ChatRoom>());
+                    userChatRooms = new User(new HashMap<>(), new HashMap<>());
                 }
             }
 
