@@ -4,7 +4,6 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.antonitor.gotchat.R;
-import com.antonitor.gotchat.databinding.ItemRoomBinding;
 import com.antonitor.gotchat.databinding.OwnRoomBinding;
 import com.antonitor.gotchat.model.ChatRoom;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -17,15 +16,17 @@ import androidx.recyclerview.widget.RecyclerView;
 public class RecyclerViewAdapterOwn extends FirebaseRecyclerAdapter {
 
     private OnCloseClickListener onCloseClickListener;
+    private OnTitleClickListener onTitleClickListener;
     private OwnRoomBinding itemBinding;
 
     public interface OnCloseClickListener {
         void onCloseClicked(ChatRoom room);
     }
 
-    public RecyclerViewAdapterOwn(@NonNull FirebaseRecyclerOptions options, OnCloseClickListener onClickListener) {
+    public RecyclerViewAdapterOwn(@NonNull FirebaseRecyclerOptions options, OnCloseClickListener onCloseClickListener, OnTitleClickListener onTitleClickListener) {
         super(options);
-        this.onCloseClickListener = onClickListener;
+        this.onCloseClickListener = onCloseClickListener;
+        this.onTitleClickListener = onTitleClickListener;
     }
 
     @Override
@@ -37,6 +38,12 @@ public class RecyclerViewAdapterOwn extends FirebaseRecyclerAdapter {
         roomViewHolder.itemBinding.setImage(room.getImageUrl());
         roomViewHolder.itemBinding.followButton
                 .setOnClickListener(view -> onCloseClickListener.onCloseClicked(room));
+        roomViewHolder.itemBinding.tvTitle
+                .setOnClickListener(view -> onTitleClickListener.onTitleClicked(room));
+    }
+
+    public interface OnTitleClickListener {
+        void onTitleClicked(ChatRoom room);
     }
 
     @NonNull

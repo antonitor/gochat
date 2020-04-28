@@ -1,7 +1,6 @@
 package com.antonitor.gotchat.ui.roomlist;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.antonitor.gotchat.R;
@@ -17,15 +16,17 @@ import androidx.recyclerview.widget.RecyclerView;
 public class RecyclerViewAdapterTrending extends FirebaseRecyclerAdapter {
 
     private OnFollowClickListener onClickListener;
+    private OnTitleClickListener onTitleClickListener;
     private ItemRoomBinding itemBinding;
 
     public interface OnFollowClickListener {
         void onFollowClicked(ChatRoom room);
     }
 
-    public RecyclerViewAdapterTrending(@NonNull FirebaseRecyclerOptions options, OnFollowClickListener onClickListener) {
+    public RecyclerViewAdapterTrending(@NonNull FirebaseRecyclerOptions options, OnFollowClickListener onFollowClickListener, OnTitleClickListener onTitleClickListener) {
         super(options);
-        this.onClickListener = onClickListener;
+        this.onClickListener = onFollowClickListener;
+        this.onTitleClickListener = onTitleClickListener;
     }
 
     @Override
@@ -37,6 +38,12 @@ public class RecyclerViewAdapterTrending extends FirebaseRecyclerAdapter {
         roomViewHolder.itemBinding.setImage(room.getImageUrl());
         roomViewHolder.itemBinding.followButton
                 .setOnClickListener(view -> onClickListener.onFollowClicked(room));
+        roomViewHolder.itemBinding.tvTitle
+                .setOnClickListener(view -> onTitleClickListener.onTitleClicked(room));
+    }
+
+    public interface OnTitleClickListener {
+        void onTitleClicked(ChatRoom room);
     }
 
     @NonNull

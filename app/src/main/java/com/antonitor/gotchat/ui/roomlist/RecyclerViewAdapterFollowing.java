@@ -15,16 +15,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class RecyclerViewAdapterFollowing extends FirebaseRecyclerAdapter {
 
-    private OnUnfollowClickListener onClickListener;
+    private OnUnfollowClickListener onUnfollowClickListener;
+    private OnTitleClickListener onTitleClickListener;
     private FollowedRoomBinding itemBinding;
 
     public interface OnUnfollowClickListener {
         void onUnfollowClicked(ChatRoom room);
     }
 
-    public RecyclerViewAdapterFollowing(@NonNull FirebaseRecyclerOptions options, OnUnfollowClickListener onClickListener) {
+    public RecyclerViewAdapterFollowing(@NonNull FirebaseRecyclerOptions options, OnUnfollowClickListener onUnfollowClickListener, OnTitleClickListener onTitleClickListener) {
         super(options);
-        this.onClickListener = onClickListener;
+        this.onUnfollowClickListener = onUnfollowClickListener;
+        this.onTitleClickListener = onTitleClickListener;
     }
 
     @Override
@@ -35,7 +37,13 @@ public class RecyclerViewAdapterFollowing extends FirebaseRecyclerAdapter {
         roomViewHolder.bind(room);
         roomViewHolder.itemBinding.setImage(room.getImageUrl());
         roomViewHolder.itemBinding.followButton
-                .setOnClickListener(view -> onClickListener.onUnfollowClicked(room));
+                .setOnClickListener(view -> onUnfollowClickListener.onUnfollowClicked(room));
+        roomViewHolder.itemBinding.tvTitle
+                .setOnClickListener(view -> onTitleClickListener.onTitleClicked(room));
+    }
+
+    public interface OnTitleClickListener {
+        void onTitleClicked(ChatRoom room);
     }
 
     @NonNull

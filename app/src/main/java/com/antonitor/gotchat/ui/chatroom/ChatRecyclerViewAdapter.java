@@ -1,4 +1,4 @@
 package com.antonitor.gotchat.ui.chatroom;
 
-public class ChatRoomRecyclerViewAdapter {
+public class ChatRecyclerViewAdapter {
 }

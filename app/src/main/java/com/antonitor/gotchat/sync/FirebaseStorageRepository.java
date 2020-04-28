@@ -40,7 +40,7 @@ public class FirebaseStorageRepository {
 
     public UploadTask uploadBitmap(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, baos);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         final String randomName = "image-"+ (new Date().getTime());
         final StorageReference pictureRef = roomImageStorageReference.child(randomName +".jpg");
         return pictureRef.putBytes(baos.toByteArray());

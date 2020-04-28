@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import com.antonitor.gotchat.R;
 
-public class ChatRoomActivity extends AppCompatActivity {
+public class ChatActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

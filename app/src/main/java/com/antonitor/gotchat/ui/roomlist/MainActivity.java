@@ -18,6 +18,8 @@ import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.vanniktech.emoji.EmojiManager;
+import com.vanniktech.emoji.google.GoogleEmojiProvider;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        EmojiManager.install(new GoogleEmojiProvider());
 
         //Initialize repository
         goChatData = FirebaseDatabaseRepository.getInstance();

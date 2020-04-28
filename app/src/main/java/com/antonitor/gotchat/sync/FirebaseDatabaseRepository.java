@@ -100,7 +100,6 @@ public class FirebaseDatabaseRepository {
 
 
     private Query getTrendingRoomsQuery(){
-        //return mFirebaseDatabase.getReference().child("/chatrooms").orderByChild("likes_count");
         return mFirebaseDatabase.getReference().child(CHATROOMS_REF);
     }
 

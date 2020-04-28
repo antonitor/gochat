@@ -20,4 +20,8 @@
     <string name="extra_new_image">extra_new_image</string>
     <string name="extra_new_chatroom">extra_new_chat_room</string>
     <string name="extra_new_topic">extra_new_chatroom_topic</string>
+    <string name="emoji_picker">Emoji picker</string>
+    <string name="type_your_message">Type your message</string>
+    <string name="send_image_from_local_storage">Send image from local storage</string>
+    <string name="send_message">Send message</string>
 </resources>

@@ -1,5 +1,7 @@
 package com.antonitor.gotchat.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -12,7 +14,7 @@ import java.util.HashMap;
 import androidx.databinding.BindingAdapter;
 
 
-public class ChatRoom {
+public class ChatRoom implements Parcelable {
 
     private String id;
     private String title;
@@ -33,6 +35,26 @@ public class ChatRoom {
         this.timestamp = ServerValue.TIMESTAMP;
         this.imageUrl = imageUrl;
         this.activeUsers = new HashMap<String, FirebaseUser>();
+    }
+
+    public static final Creator<ChatRoom> CREATOR = new Creator<ChatRoom>() {
+        @Override
+        public ChatRoom createFromParcel(Parcel in) {
+            return new ChatRoom(in);
+        }
+
+        @Override
+        public ChatRoom[] newArray(int size) {
+            return new ChatRoom[size];
+        }
+    };
+
+    protected ChatRoom(Parcel in) {
+        id = in.readString();
+        title = in.readString();
+        topic = in.readString();
+        owner = in.readString();
+        imageUrl = in.readString();
     }
 
     public String getId() {
@@ -96,5 +118,19 @@ public class ChatRoom {
         Glide.with(view.getContext())
                 .load(imageUrl).apply(new RequestOptions().circleCrop())
                 .into(view);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(id);
+        parcel.writeString(title);
+        parcel.writeString(topic);
+        parcel.writeString(owner);
+        parcel.writeString(imageUrl);
     }
 }

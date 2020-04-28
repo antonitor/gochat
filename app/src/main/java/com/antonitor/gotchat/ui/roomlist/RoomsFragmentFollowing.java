@@ -1,5 +1,6 @@
 package com.antonitor.gotchat.ui.roomlist;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -9,6 +10,7 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,11 +19,12 @@ import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.FragmentFollowingListBinding;
 import com.antonitor.gotchat.model.ChatRoom;
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
+import com.antonitor.gotchat.ui.chatroom.ChatActivity;
 
 import java.util.Objects;
 
 
-public class RoomsFragmentFollowing extends Fragment implements RecyclerViewAdapterFollowing.OnUnfollowClickListener {
+public class RoomsFragmentFollowing extends Fragment implements RecyclerViewAdapterFollowing.OnUnfollowClickListener, RecyclerViewAdapterFollowing.OnTitleClickListener {
 
     private ViewModel viewModel;
     private FragmentFollowingListBinding mDataBinding;
@@ -53,7 +56,7 @@ public class RoomsFragmentFollowing extends Fragment implements RecyclerViewAdap
 
     private void setUpRecyclerView(){
         recyclerViewAdapter = new RecyclerViewAdapterFollowing(
-                FirebaseDatabaseRepository.getInstance().getFollowedChatRoomListOptions(), this);
+                FirebaseDatabaseRepository.getInstance().getFollowedChatRoomListOptions(), this, this);
         mDataBinding.followingRecyclerview.setAdapter(recyclerViewAdapter);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         //manager.setReverseLayout(true);
@@ -66,5 +69,12 @@ public class RoomsFragmentFollowing extends Fragment implements RecyclerViewAdap
     @Override
     public void onUnfollowClicked(ChatRoom room) {
         FirebaseDatabaseRepository.getInstance().unFollowChat(room);
+    }
+
+    @Override
+    public void onTitleClicked(ChatRoom room) {
+        Intent chatIntent = new Intent(getActivity(), ChatActivity.class);
+        chatIntent.putExtra("", (Parcelable) room);
+        getActivity().startActivity(chatIntent);
     }
 }
