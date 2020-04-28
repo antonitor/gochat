@@ -12,7 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.antonitor.gotchat.R;
-import com.antonitor.gotchat.sync.FBRDatabaseData;
+import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.tabs.TabLayout;
@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 1341;
     private static final String TAG = MainActivity.class.getCanonicalName();
 
-    private FBRDatabaseData goChatData;
+    private FirebaseDatabaseRepository goChatData;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //Initialize repository
-        goChatData = FBRDatabaseData.getInstance();
+        goChatData = FirebaseDatabaseRepository.getInstance();
 
         //add viwemodel
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
@@ -87,8 +87,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void onSingedInInitialize(FirebaseUser user) {
 
-        FBRDatabaseData.getInstance().setFirebaseUser(user);
-        Log.d(TAG, "LOGGED AS " + FBRDatabaseData.getInstance().getFirebaseUser().getPhoneNumber());
+        FirebaseDatabaseRepository.getInstance().setFirebaseUser(user);
+        Log.d(TAG, "LOGGED AS " + FirebaseDatabaseRepository.getInstance().getFirebaseUser().getPhoneNumber());
         startFragmentPageAdapter();
 
     }

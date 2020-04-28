@@ -16,13 +16,12 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.HashMap;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 
-public class FBRDatabaseData {
+public class FirebaseDatabaseRepository {
 
-    private static final String LOG_TAG = FBRDatabaseData.class.getSimpleName();
-    private static FBRDatabaseData sInstance;
+    private static final String LOG_TAG = FirebaseDatabaseRepository.class.getSimpleName();
+    private static FirebaseDatabaseRepository sInstance;
     private static final Object LOCK = new Object();
 
     private static final String CHATROOMS_REF = "chatrooms";
@@ -35,17 +34,17 @@ public class FBRDatabaseData {
     private DatabaseReference chatroomsReference;
     private DatabaseReference userChatsReference;
 
-    private FBRDatabaseData(){
+    private FirebaseDatabaseRepository(){
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         chatroomsReference = mFirebaseDatabase.getReference().child(CHATROOMS_REF);
         userChatsReference = mFirebaseDatabase.getReference().child(USER_CHATS);
     }
 
-    public static FBRDatabaseData getInstance() {
+    public static FirebaseDatabaseRepository getInstance() {
         Log.d(LOG_TAG, "Getting the network data source");
         if (sInstance == null) {
             synchronized (LOCK) {
-                sInstance = new FBRDatabaseData();
+                sInstance = new FirebaseDatabaseRepository();
                 Log.d(LOG_TAG, "Made new network data source");
             }
         }

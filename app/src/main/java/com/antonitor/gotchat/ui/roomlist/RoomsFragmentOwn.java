@@ -16,9 +16,7 @@ import android.view.ViewGroup;
 import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.FragmentOwnRoomsBinding;
 import com.antonitor.gotchat.model.ChatRoom;
-import com.antonitor.gotchat.sync.FBRDatabaseData;
-
-import java.util.Random;
+import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,9 +31,8 @@ public class RoomsFragmentOwn extends Fragment implements RecyclerViewAdapterOwn
 
     public RoomsFragmentOwn() {}
 
-    public static RoomsFragmentOwn newInstance() {
-        RoomsFragmentOwn fragment = new RoomsFragmentOwn();
-        return fragment;
+    static RoomsFragmentOwn newInstance() {
+        return new RoomsFragmentOwn();
     }
 
     @Override
@@ -55,31 +52,17 @@ public class RoomsFragmentOwn extends Fragment implements RecyclerViewAdapterOwn
     }
 
     private void setUpAddFab(){
-        mDataBinding.addFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent newChatRoomIntent = new Intent(getActivity(), AddNewRoomActivity.class);
-                getActivity().startActivity(newChatRoomIntent);
-                //getActivity().startActivityForResult(newChatRoomIntent, MainActivity.RC_NEW_CHAT_ROOM);
-                /*
-                int rand = new Random().nextInt(100);
-                String roomID = "" + rand;
-                String title = "Room " + rand;
-                String topic = "topic " + rand;
-                String photoUrl = null;
-                FBRDatabaseData.getInstance().newChatRoom(roomID, title, topic, photoUrl);
-                */
-            }
+        mDataBinding.addFab.setOnClickListener(view -> {
+            Intent newChatRoomIntent = new Intent(getActivity(), AddNewRoomActivity.class);
+            getActivity().startActivity(newChatRoomIntent);
         });
     }
 
     private void setUpRecyclerView(){
         recyclerViewAdapter = new RecyclerViewAdapterOwn(
-                FBRDatabaseData.getInstance().getOwnChatRoomListOptions(), this);
+                FirebaseDatabaseRepository.getInstance().getOwnChatRoomListOptions(), this);
         mDataBinding.ownRecyclerview.setAdapter(recyclerViewAdapter);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
-        //manager.setReverseLayout(true);
-        //manager.setStackFromEnd(true);
         mDataBinding.ownRecyclerview.setLayoutManager(manager);
         recyclerViewAdapter.startListening();
     }
@@ -94,6 +77,6 @@ public class RoomsFragmentOwn extends Fragment implements RecyclerViewAdapterOwn
 
     @Override
     public void onCloseClicked(ChatRoom room) {
-        FBRDatabaseData.getInstance().removeChatRoom(room.getId());
+        FirebaseDatabaseRepository.getInstance().removeChatRoom(room.getId());
     }
 }

@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
@@ -16,120 +16,46 @@ import android.widget.Toast;
 
 import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.ActivityAddNewRoomBinding;
-import com.antonitor.gotchat.sync.FBRDatabaseData;
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
-import java.io.ByteArrayOutputStream;
-import java.util.Date;
+import static com.antonitor.gotchat.utilities.Utilities.bitmapByteArray;
 
 public class AddNewRoomActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = AddNewRoomActivity.class.getSimpleName();
     private static final int RC_PHOTO_PICKER = 1;
     private static final int RC_CAMERA_ACTION = 2;
 
     private ActivityAddNewRoomBinding dataBinding;
     private AddNewRoomViewModel viewModel;
 
-    private FirebaseStorage firebaseStorage;
-    private StorageReference chatRoomImageStorageReference;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dataBinding = DataBindingUtil.setContentView(this, R.layout.activity_add_new_room);
         viewModel = new ViewModelProvider(this).get(AddNewRoomViewModel.class);
-        viewModel.setImageChosen(false);
 
-        firebaseStorage = FirebaseStorage.getInstance();
-        chatRoomImageStorageReference = firebaseStorage.getReference("chatroom_images");
+        dataBinding.takePictureButton.setOnClickListener(this::takePictureOnClickListener);
+        dataBinding.addPictureButton.setOnClickListener(this::addPictureOnClickListener);
+        dataBinding.addButton.setOnClickListener(this::addButtonOnClickListener);
 
-        dataBinding.addPictureButton.setOnClickListener(view -> {
-            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                startActivityForResult(takePictureIntent, RC_CAMERA_ACTION);
-            }
-        });
-
-        dataBinding.takePictureButton.setOnClickListener(view -> {
-            Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
-            getIntent.setType("image/*");
-
-            Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            pickIntent.setType("image/*");
-
-            Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
-            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent});
-
-            startActivityForResult(chooserIntent, RC_PHOTO_PICKER);
-        });
-
-        dataBinding.addButton.setOnClickListener(view -> {
-            if (!dataBinding.newChatroomEt.getText().toString().trim().equals("")) {
-                //final Intent data = new Intent();
-                final String title = dataBinding.newChatroomEt.getText().toString();
-                final String topic = dataBinding.newTextEt.getText().toString();
-                if (viewModel.isImageChosen()) {
-                    dataBinding.progressBarPictureUpload.setVisibility(View.VISIBLE);
-                    Observer<String> imageUrlObserver = imageUrl -> {
-                        FBRDatabaseData.getInstance().newChatRoom(title, title, topic, imageUrl);
-                        /*
-                        data.putExtra(getString(R.string.extra_new_image), imageUrl);
-                        data.putExtra(getString(R.string.extra_new_chatroom), title);
-                        data.putExtra(getString(R.string.extra_new_topic), topic);
-                        setResult(RESULT_OK, data);
-                        */
-                        dataBinding.progressBarPictureUpload.setVisibility(View.INVISIBLE);
-                        finish();
-                    };
-                    viewModel.getImageUrl().observe(AddNewRoomActivity.this, imageUrlObserver);
-                    storeImage();
-                } else {
-                    FBRDatabaseData.getInstance().newChatRoom(title, title, topic, null);
-                    /*
-                    data.putExtra(getString(R.string.extra_new_chatroom), title);
-                    data.putExtra(getString(R.string.extra_new_topic), topic);
-                    setResult(RESULT_OK, data);
-                    */
-                    finish();
-                }
-            } else {
-                Toast.makeText(AddNewRoomActivity.this, "Imprescindible añadir un #Hashtag y una descripcion!", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        dataBinding.cancelButton.setOnClickListener(view -> {
-            finish();
-        });
+        viewModel.getIsLoading().observe(this, getLoadingObserver());
     }
 
-    private void storeImage() {
-        if (viewModel.isBitmap()) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            viewModel.getBitmap().compress(Bitmap.CompressFormat.JPEG, 100, baos);
-            final String randomImageName = "image-" + (new Date().getTime());
-            final StorageReference photoRef = chatRoomImageStorageReference.child(randomImageName + ".jpg");
-            UploadTask uploadTask = photoRef.putBytes(baos.toByteArray());
-            uploadTask.addOnSuccessListener(this, taskSnapshot -> {
-                Task<Uri> urlTask = taskSnapshot.getMetadata().getReference().getDownloadUrl();
-                while (!urlTask.isSuccessful()) ;
-                Uri downloadUrl = urlTask.getResult();
-                viewModel.setImageUrl(downloadUrl.toString());
-            });
-        } else {
-            StorageReference photoRef = chatRoomImageStorageReference.child(viewModel.getUri().getLastPathSegment());
-            photoRef.putFile(viewModel.getUri()).addOnSuccessListener(this, taskSnapshot -> {
-                Task<Uri> urlTask = taskSnapshot.getMetadata().getReference().getDownloadUrl();
-                while (!urlTask.isSuccessful()) ;
-                Uri downloadUrl = urlTask.getResult();
-                viewModel.setImageUrl(downloadUrl.toString());
-            });
+    private void takePictureOnClickListener(View view) {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, RC_CAMERA_ACTION);
         }
+    }
+
+    private void addPictureOnClickListener(View view) {
+        Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        getIntent.setType("image/*");
+        Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        pickIntent.setType("image/*");
+        Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent});
+        startActivityForResult(chooserIntent, RC_PHOTO_PICKER);
     }
 
     @Override
@@ -138,11 +64,10 @@ public class AddNewRoomActivity extends AppCompatActivity {
         switch (requestCode) {
             case RC_PHOTO_PICKER:
                 if (resultCode == RESULT_OK) {
-                    Uri selectedImageUri = data.getData();
-                    viewModel.setUri(selectedImageUri);
-                    viewModel.setImageChosen(true);
+                    viewModel.setLocalImageUri(data.getData());
+                    viewModel.setImageChosen();
                     Glide.with(this)
-                            .load(selectedImageUri)
+                            .load(viewModel.getLocalImageUri())
                             .into(dataBinding.newChatroomIv);
                 }
                 break;
@@ -151,14 +76,57 @@ public class AddNewRoomActivity extends AppCompatActivity {
                     Bundle extras = data.getExtras();
                     Bitmap imageBitmap = (Bitmap) extras.get("data");
                     viewModel.setBitmap(imageBitmap);
-                    viewModel.setImageChosen(true);
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    imageBitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+                    viewModel.setImageChosen();
                     Glide.with(this)
                             .asBitmap()
-                            .load(baos.toByteArray())
+                            .load(bitmapByteArray(imageBitmap))
                             .into(dataBinding.newChatroomIv);
                 }
         }
+    }
+
+    private void addButtonOnClickListener(View view) {
+        if (!dataBinding.newChatroomEt.getText().toString().trim().equals("")
+                && !dataBinding.newTextEt.getText().toString().trim().equals("")) {
+            final String title = dataBinding.newChatroomEt.getText().toString();
+            final String topic = dataBinding.newTextEt.getText().toString();
+            if (viewModel.isImageChosen()) {
+                Observer<String> imageUrlObserver = imageURl -> {
+                    viewModel.newChatRoom(title, topic, imageURl);
+                    finish();
+                };
+                viewModel.getImageUrl().observe(this, imageUrlObserver);
+                viewModel.uploadImage();
+            } else {
+                Toast.makeText(this, "Please, chose and image!", Toast.LENGTH_LONG).show();
+            }
+        } else {
+            Toast.makeText(this, "Please, type in title and topic!", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private Observer<Boolean> getLoadingObserver() {
+        return isLoading -> {
+            if(isLoading) {
+                disableViewsWhileLoading();
+                Observer<Double> progress = aDouble -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        dataBinding.progressBarPictureUpload.setProgress(aDouble.intValue(), true);
+                    }
+                };
+                viewModel.getUploadProgress().observe(AddNewRoomActivity.this, progress);
+            }
+        };
+    }
+
+    private void disableViewsWhileLoading() {
+        dataBinding.progressBarPictureUpload.setVisibility(View.VISIBLE);
+        dataBinding.takePictureButton.setEnabled(false);
+        dataBinding.addPictureButton.setEnabled(false);
+        dataBinding.addButton.setEnabled(false);
+        dataBinding.cancelButton.setEnabled(false);
+        dataBinding.textInputLayout.setEnabled(false);
+        dataBinding.textInputLayout2.setEnabled(false);
+        dataBinding.newChatroomIv.setImageAlpha(125);
     }
 }

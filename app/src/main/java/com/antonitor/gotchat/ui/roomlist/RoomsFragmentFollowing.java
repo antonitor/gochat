@@ -16,7 +16,7 @@ import android.view.ViewGroup;
 import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.FragmentFollowingListBinding;
 import com.antonitor.gotchat.model.ChatRoom;
-import com.antonitor.gotchat.sync.FBRDatabaseData;
+import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
 
 import java.util.Objects;
 
@@ -53,7 +53,7 @@ public class RoomsFragmentFollowing extends Fragment implements RecyclerViewAdap
 
     private void setUpRecyclerView(){
         recyclerViewAdapter = new RecyclerViewAdapterFollowing(
-                FBRDatabaseData.getInstance().getFollowedChatRoomListOptions(), this);
+                FirebaseDatabaseRepository.getInstance().getFollowedChatRoomListOptions(), this);
         mDataBinding.followingRecyclerview.setAdapter(recyclerViewAdapter);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         //manager.setReverseLayout(true);
@@ -65,6 +65,6 @@ public class RoomsFragmentFollowing extends Fragment implements RecyclerViewAdap
 
     @Override
     public void onUnfollowClicked(ChatRoom room) {
-        FBRDatabaseData.getInstance().unFollowChat(room);
+        FirebaseDatabaseRepository.getInstance().unFollowChat(room);
     }
 }

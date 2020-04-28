@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.FragmentTrendigListBinding;
 import com.antonitor.gotchat.model.ChatRoom;
-import com.antonitor.gotchat.sync.FBRDatabaseData;
+import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,7 +33,7 @@ public class RoomsFragmentTrending extends Fragment implements RecyclerViewAdapt
     }
 
 
-    public static RoomsFragmentTrending newInstance() {
+    static RoomsFragmentTrending newInstance() {
         return new RoomsFragmentTrending();
     }
 
@@ -55,7 +55,7 @@ public class RoomsFragmentTrending extends Fragment implements RecyclerViewAdapt
 
     private void setUpRecyclerView(){
         recyclerViewAdapter = new RecyclerViewAdapterTrending(
-                FBRDatabaseData.getInstance().getTrendingChatRoomListOptions(),
+                FirebaseDatabaseRepository.getInstance().getTrendingChatRoomListOptions(),
                 this);
         mDataBinding.trendingRecyclerview.setAdapter(recyclerViewAdapter);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
@@ -68,6 +68,6 @@ public class RoomsFragmentTrending extends Fragment implements RecyclerViewAdapt
 
     @Override
     public void onFollowClicked(ChatRoom room) {
-        FBRDatabaseData.getInstance().addFollowingChat(room);
+        FirebaseDatabaseRepository.getInstance().addFollowingChat(room);
     }
 }
