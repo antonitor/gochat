@@ -2,8 +2,12 @@ package com.antonitor.gotchat.model;
 
 import com.google.firebase.database.ServerValue;
 
+import java.util.Random;
+import java.util.UUID;
+
 public class Message {
 
+    private String id;
     private String text;
     private String name;
     private String photoUrl;
@@ -17,6 +21,7 @@ public class Message {
         this.name = name;
         this.photoUrl = photoUrl;
         this.timeStamp = ServerValue.TIMESTAMP;
+        setId();
     }
 
     public String getText() {
@@ -49,5 +54,17 @@ public class Message {
 
     public void setTimeStamp(Object timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    private void setId() {
+        this.id = UUID.randomUUID().toString();
     }
 }
