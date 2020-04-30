@@ -1,6 +1,12 @@
 package com.antonitor.gotchat.model;
 
+import android.view.View;
+import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
 import com.google.firebase.database.ServerValue;
+
+import androidx.databinding.BindingAdapter;
 
 public class Message {
 
@@ -59,5 +65,17 @@ public class Message {
 
     public void setRoomID(String roomID) {
         this.roomID = roomID;
+    }
+
+    @BindingAdapter("chatImage")
+    public static void loadImage(ImageView view, String imageUrl) {
+        Glide.with(view.getContext())
+                .load(imageUrl)
+                .into(view);
+    }
+
+    @BindingAdapter("android:visibility")
+    public static void setVisibility(View view, Boolean value) {
+        view.setVisibility(value ? View.VISIBLE : View.GONE);
     }
 }

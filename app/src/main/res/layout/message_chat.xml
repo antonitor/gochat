@@ -6,84 +6,62 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
-        android:layout_marginEnd="64dp"
         android:layout_marginStart="4dp"
         android:background="@drawable/user_message_box"
         android:elevation="1dp"
-        android:orientation="horizontal"
         android:paddingBottom="4dp"
         android:paddingEnd="4dp"
-        android:paddingStart="0dp"
+        android:orientation="horizontal"
+        android:paddingStart="12dp"
         android:paddingTop="4dp">
 
         <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:elevation="1dp"
-        android:orientation="vertical"
-        android:paddingBottom="4dp"
-        android:paddingEnd="4dp"
-        android:paddingStart="0dp"
-        android:paddingTop="4dp">
+        android:orientation="vertical">
 
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone">
-        <ImageView
-            android:id="@+id/photoImageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/cd_image_send_by_user"
-            android:maxHeight="200dp"
-            android:maxWidth="200dp"
-            android:visibility="invisible"/>
+            <ImageView
+                    android:id="@+id/photoImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/cd_image_send_by_user"
+                    android:maxHeight="200dp"
+                    android:maxWidth="200dp"
+                    android:visibility="@{message.photoUrl!=null}"/>
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:visibility="gone"/>
-        </FrameLayout>
 
-        <TextView
-            android:id="@+id/author_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0"
-            android:fontFamily="sans-serif"
-            android:text="@{message.author}"
-            android:textColor="@color/colorPrimaryDark"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            tools:text="Name" />
-        <TextView
-            android:id="@+id/message_tv"
-            style="@style/Base.Theme.AppCompat.Dialog"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_weight="0"
-            android:fontFamily="sans-serif"
-            android:text="@{message.text}"
-            android:textColor="#181919"
-            android:textSize="16sp"
-            tools:text="Message"/>
+                <TextView
+                android:id="@+id/author_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:text="@{message.author}"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="Name" />
+                    <!--app:chatImage="@{image}"-->
+
+            <TextView
+                android:id="@+id/message_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:text="@{message.text}"
+                android:textColor="#181919"
+                android:textSize="16sp"
+                android:visibility="@{message.photoUrl==null}"
+                tools:text="Message"/>
 
         </LinearLayout>
-
-    <View
-            android:layout_width="12dp"
-            android:layout_height="match_parent"
-            android:background="@drawable/user_message_box"
-            android:elevation="1dp" />
     </LinearLayout>
 
     <data>
         <variable name="message" type="com.antonitor.gotchat.model.Message"/>
+        <variable name="image" type="String" />
     </data>
 </layout>

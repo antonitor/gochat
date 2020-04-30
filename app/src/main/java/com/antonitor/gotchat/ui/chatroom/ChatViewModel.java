@@ -28,7 +28,7 @@ public class ChatViewModel extends ViewModel {
     private MutableLiveData<Double> uploadProgress = new MutableLiveData<>();
     private MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
 
-    public void postMessage(Message message) {
+    void postMessage(Message message) {
         FirebaseDatabaseRepository.getInstance().postMessage(message);
     }
 
@@ -40,8 +40,6 @@ public class ChatViewModel extends ViewModel {
                 Log.v(TAG, "File: " + taskSnapshot.getMetadata().getName());
                 Log.v(TAG, "Path: " + taskSnapshot.getMetadata().getPath());
                 Log.v(TAG, "Size: " + taskSnapshot.getMetadata().getSizeBytes()/1000 + " kb");
-                Log.v(TAG, "Encoding: " + taskSnapshot.getMetadata().getContentEncoding());
-                Log.v(TAG, "Upload time: " + taskSnapshot.getMetadata().getUpdatedTimeMillis()/1000 + " sec.");
                 Task<Uri> urlTask = taskSnapshot.getMetadata().getReference().getDownloadUrl();
                 while (!urlTask.isSuccessful()) ;
                 Uri downloadUrl = urlTask.getResult();
@@ -62,8 +60,6 @@ public class ChatViewModel extends ViewModel {
                 Log.d(TAG, "File: " + taskSnapshot.getMetadata().getName());
                 Log.d(TAG, "Path: " + taskSnapshot.getMetadata().getPath());
                 Log.d(TAG, "Size: " + taskSnapshot.getMetadata().getSizeBytes()/1000 + " kb");
-                Log.d(TAG, "Encoding: " + taskSnapshot.getMetadata().getContentEncoding());
-                Log.d(TAG, "Upload time: " + taskSnapshot.getMetadata().getUpdatedTimeMillis()/1000 + " sec.");
                 Task<Uri> urlTask = taskSnapshot.getMetadata().getReference().getDownloadUrl();
                 while (!urlTask.isSuccessful()) ;
                 Uri downloadUrl = urlTask.getResult();
@@ -119,11 +115,11 @@ public class ChatViewModel extends ViewModel {
         this.localImageUri = localImageUri;
     }
 
-    public ChatRoom getChatRoom() {
+    ChatRoom getChatRoom() {
         return chatRoom;
     }
 
-    public void setChatRoom(ChatRoom chatRoom) {
+    void setChatRoom(ChatRoom chatRoom) {
         this.chatRoom = chatRoom;
     }
 }

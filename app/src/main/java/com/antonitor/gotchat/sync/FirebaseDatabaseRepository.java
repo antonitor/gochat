@@ -105,9 +105,6 @@ public class FirebaseDatabaseRepository {
         messageReference.child(roomID).push().setValue(message);
     }
 
-
-
-
     private Query getTrendingRoomsQuery(){
         return mFirebaseDatabase.getReference().child(CHATROOMS_REF);
     }
@@ -138,7 +135,7 @@ public class FirebaseDatabaseRepository {
                 .build();
     }
 
-    public Query getMessageListQuery(String roomId){
+    private Query getMessageListQuery(String roomId){
         return messageReference.child(roomId);
     }
 
