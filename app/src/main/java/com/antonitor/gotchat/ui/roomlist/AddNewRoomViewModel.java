@@ -30,7 +30,9 @@ public class AddNewRoomViewModel extends ViewModel {
 
     void uploadImage() {
         if (bitmap != null) {
-            UploadTask upTask = FirebaseStorageRepository.getInstance().uploadBitmap(bitmap);
+            UploadTask upTask = FirebaseStorageRepository.getInstance()
+                    .uploadBitmap(bitmap, FirebaseStorageRepository.getInstance()
+                            .getRoomImageStorageReference());
             upTask.addOnSuccessListener(taskSnapshot -> {
                 Log.d(TAG, "SUCCESFULL BITMAP UPLOAD");
                 Log.d(TAG, "File: " + taskSnapshot.getMetadata().getName());

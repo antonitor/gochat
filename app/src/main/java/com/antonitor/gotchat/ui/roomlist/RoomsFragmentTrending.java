@@ -77,7 +77,14 @@ public class RoomsFragmentTrending extends Fragment implements RecyclerViewAdapt
     @Override
     public void onTitleClicked(ChatRoom room) {
         Intent chatIntent = new Intent(getActivity(), ChatActivity.class);
-        chatIntent.putExtra("", (Parcelable) room);
+        chatIntent.putExtra(getString(R.string.key_chatroom), room);
         getActivity().startActivity(chatIntent);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (recyclerViewAdapter != null)
+            recyclerViewAdapter.stopListening();
     }
 }

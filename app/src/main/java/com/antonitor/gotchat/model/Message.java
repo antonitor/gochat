@@ -2,26 +2,23 @@ package com.antonitor.gotchat.model;
 
 import com.google.firebase.database.ServerValue;
 
-import java.util.Random;
-import java.util.UUID;
-
 public class Message {
 
-    private String id;
+    private String roomID;
     private String text;
-    private String name;
+    private String author;
     private String photoUrl;
     private Object timeStamp;
 
     public Message() {
     }
 
-    public Message(String text, String name, String photoUrl) {
+    public Message(String roomId, String text, String author, String photoUrl) {
+        this.roomID = roomId;
         this.text = text;
-        this.name = name;
+        this.author = author;
         this.photoUrl = photoUrl;
         this.timeStamp = ServerValue.TIMESTAMP;
-        setId();
     }
 
     public String getText() {
@@ -32,12 +29,12 @@ public class Message {
         this.text = text;
     }
 
-    public String getName() {
-        return name;
+    public String getAuthor() {
+        return author;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public String getPhotoUrl() {
@@ -56,15 +53,11 @@ public class Message {
         this.timeStamp = timeStamp;
     }
 
-    public String getId() {
-        return id;
+    public String getRoomID() {
+        return roomID;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    private void setId() {
-        this.id = UUID.randomUUID().toString();
+    public void setRoomID(String roomID) {
+        this.roomID = roomID;
     }
 }

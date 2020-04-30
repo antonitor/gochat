@@ -3,6 +3,7 @@ package com.antonitor.gotchat.sync;
 import android.util.Log;
 
 import com.antonitor.gotchat.model.ChatRoom;
+import com.antonitor.gotchat.model.Message;
 import com.antonitor.gotchat.model.User;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseUser;
@@ -16,7 +17,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.HashMap;
 
 import androidx.annotation.NonNull;
-
 
 public class FirebaseDatabaseRepository {
 
@@ -33,11 +33,13 @@ public class FirebaseDatabaseRepository {
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference chatroomsReference;
     private DatabaseReference userChatsReference;
+    private DatabaseReference messageReference;
 
     private FirebaseDatabaseRepository(){
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         chatroomsReference = mFirebaseDatabase.getReference().child(CHATROOMS_REF);
         userChatsReference = mFirebaseDatabase.getReference().child(USER_CHATS);
+        messageReference = mFirebaseDatabase.getReference().child(MESSAGES_REF);
     }
 
     public static FirebaseDatabaseRepository getInstance() {
@@ -50,7 +52,6 @@ public class FirebaseDatabaseRepository {
         }
         return sInstance;
     }
-
 
     /**
      * Add new Chat Room stored as /chatrooms/roomID
@@ -95,8 +96,16 @@ public class FirebaseDatabaseRepository {
             userChatRooms.getFollowedChatRooms().remove(roomID);
             userChatsReference.child(userUid).child("ownChatRooms").child(roomID).removeValue();
             userChatsReference.child(userUid).child("followedChatRooms").child(roomID).removeValue();
+            messageReference.child(roomID).removeValue();
         });
     }
+
+    public void postMessage(Message message) {
+                String roomID = message.getRoomID();
+        messageReference.child(roomID).push().setValue(message);
+    }
+
+
 
 
     private Query getTrendingRoomsQuery(){
@@ -129,8 +138,14 @@ public class FirebaseDatabaseRepository {
                 .build();
     }
 
-    public FirebaseDatabase getmFirebaseDatabase() {
-        return mFirebaseDatabase;
+    public Query getMessageListQuery(String roomId){
+        return messageReference.child(roomId);
+    }
+
+    public FirebaseRecyclerOptions<Message> getMessageListOptions(String roomID){
+        return new FirebaseRecyclerOptions.Builder<Message>()
+                .setQuery(getMessageListQuery(roomID), Message.class)
+                .build();
     }
 
     public FirebaseUser getFirebaseUser() {

@@ -77,4 +77,11 @@ public class RoomsFragmentFollowing extends Fragment implements RecyclerViewAdap
         chatIntent.putExtra("", (Parcelable) room);
         getActivity().startActivity(chatIntent);
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (recyclerViewAdapter != null)
+            recyclerViewAdapter.stopListening();
+    }
 }

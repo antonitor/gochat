@@ -24,4 +24,6 @@
     <string name="type_your_message">Type your message</string>
     <string name="send_image_from_local_storage">Send image from local storage</string>
     <string name="send_message">Send message</string>
+    <string name="key_chatroom">key-chat-room</string>
+    <string name="cd_image_send_by_user">Image send by user</string>
 </resources>

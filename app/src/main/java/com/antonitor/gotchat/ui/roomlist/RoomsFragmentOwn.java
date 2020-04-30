@@ -69,13 +69,6 @@ public class RoomsFragmentOwn extends Fragment implements RecyclerViewAdapterOwn
         recyclerViewAdapter.startListening();
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (recyclerViewAdapter != null)
-            recyclerViewAdapter.stopListening();
-    }
-
 
     @Override
     public void onCloseClicked(ChatRoom room) {
@@ -87,5 +80,12 @@ public class RoomsFragmentOwn extends Fragment implements RecyclerViewAdapterOwn
         Intent chatIntent = new Intent(getActivity(), ChatActivity.class);
         chatIntent.putExtra("", (Parcelable) room);
         getActivity().startActivity(chatIntent);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (recyclerViewAdapter != null)
+            recyclerViewAdapter.stopListening();
     }
 }
