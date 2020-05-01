@@ -48,13 +48,7 @@
                 android:background="@drawable/ic_insert_emoticon_grey_24dp"
                 android:contentDescription="@string/emoji_picker" />
 
-            <ImageButton
-                android:id="@+id/photoPickerButton"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_gravity="center_vertical"
-                android:background="@drawable/ic_insert_photo_grey_24dp"
-                android:contentDescription="@string/send_image_from_local_storage" />
+
 
             <com.vanniktech.emoji.EmojiEditText
                 android:id="@+id/messageEditText"
@@ -71,6 +65,13 @@
                 android:maxLines="3"
                 android:textSize="18sp" />
 
+            <ImageButton
+                android:id="@+id/photoPickerButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/ic_insert_photo_grey_24dp"
+                android:contentDescription="@string/send_image_from_local_storage" />
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
