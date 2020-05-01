@@ -52,6 +52,8 @@ public class ChatActivity extends AppCompatActivity
         dataBinding.messageRecycleView.setLayoutManager(layoutManager);
 
         //Handle user imput
+        dataBinding.sendButton.setOnClickListener(ChatActivity.this::takePhotoListener);
+        dataBinding.photoPickerButton.setOnClickListener(ChatActivity.this::sendImageListener);
         dataBinding.messageEditText.addTextChangedListener(userInputWatcher());
     }
 
@@ -61,50 +63,21 @@ public class ChatActivity extends AppCompatActivity
      */
     private TextWatcher userInputWatcher() {
             return new TextWatcher() {
-                private void sendImageListener(View view) {
-                    Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                    getIntent.setType("image/*");
-                    Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    pickIntent.setType("image/*");
-                    Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
-                    chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent});
-                    startActivityForResult(chooserIntent, RC_PHOTO_PICKER);
-                }
-                private void sendTextListener(View view) {
-                    Log.d(TAG, "SEND CLICKED --------------------------------");
-                    String text = dataBinding.messageEditText.getText().toString()
-                            .replaceFirst("\\s+$", "")
-                            .replaceFirst("^\\s+", "");
-                    String roomId = viewModel.getChatRoom().getId();
-                    String user = FirebaseDatabaseRepository.getInstance().getFirebaseUser()
-                            .getPhoneNumber();
-                    Message message = new Message(roomId, text, user, null);
-                    dataBinding.messageEditText.setText("");
-                    viewModel.postMessage(message);
-                    dataBinding.messageRecycleView.smoothScrollToPosition(adapter.getItemCount());
-                }
-                private void takePhotoListener(View view) {
-                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                        startActivityForResult(takePictureIntent, RC_CAMERA_ACTION);
-                    }
-                }
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                    dataBinding.sendButton.setOnClickListener(this::takePhotoListener);
                 }
 
                 @Override
                 public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                     if (charSequence.toString().trim().length() > 0) {
                         dataBinding.sendButton.setImageResource(R.drawable.ic_send_white_24dp);
-                        dataBinding.sendButton.setOnClickListener(this::sendTextListener);
+                        dataBinding.sendButton.setOnClickListener(ChatActivity.this::sendTextListener);
                         dataBinding.photoPickerButton.setVisibility(View.INVISIBLE);
                     } else {
                         dataBinding.sendButton.setImageResource(R.drawable.ic_camera_grey_24dp);
-                        dataBinding.sendButton.setOnClickListener(this::takePhotoListener);
+                        dataBinding.sendButton.setOnClickListener(ChatActivity.this::takePhotoListener);
                         dataBinding.photoPickerButton.setVisibility(View.VISIBLE);
-                        dataBinding.photoPickerButton.setOnClickListener(this::sendImageListener);
+                        dataBinding.photoPickerButton.setOnClickListener(ChatActivity.this::sendImageListener);
                     }
                 }
                 @Override
@@ -162,5 +135,34 @@ public class ChatActivity extends AppCompatActivity
     @Override
     public void onMessageClicked(Message message) {
 
+    }
+
+    private void sendImageListener(View view) {
+        Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        getIntent.setType("image/*");
+        Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        pickIntent.setType("image/*");
+        Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent});
+        startActivityForResult(chooserIntent, RC_PHOTO_PICKER);
+    }
+    private void sendTextListener(View view) {
+        Log.d(TAG, "SEND CLICKED --------------------------------");
+        String text = dataBinding.messageEditText.getText().toString()
+                .replaceFirst("\\s+$", "")
+                .replaceFirst("^\\s+", "");
+        String roomId = viewModel.getChatRoom().getId();
+        String user = FirebaseDatabaseRepository.getInstance().getFirebaseUser()
+                .getPhoneNumber();
+        Message message = new Message(roomId, text, user, null);
+        dataBinding.messageEditText.setText("");
+        viewModel.postMessage(message);
+        dataBinding.messageRecycleView.smoothScrollToPosition(adapter.getItemCount());
+    }
+    private void takePhotoListener(View view) {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, RC_CAMERA_ACTION);
+        }
     }
 }
