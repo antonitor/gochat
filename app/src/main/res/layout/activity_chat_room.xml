@@ -1,78 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <RelativeLayout
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/root_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/greenbackground">
-        <LinearLayout
-            android:id="@+id/chat_box"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="4dp"
+
+        <ImageButton
+            android:id="@+id/sendButton"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal">
+            android:background="@xml/round_shape"
+            android:contentDescription="@string/send_message"
+            android:elevation="6dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/ic_camera_grey_24dp" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:background="@xml/round_border"
+            android:elevation="4dp"
+            android:orientation="horizontal"
+            android:paddingBottom="6dp"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
+            android:paddingTop="6dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/sendButton"
+            app:layout_constraintStart_toStartOf="parent">
+
             <ImageButton
-                android:id="@+id/sendButton"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:background="@xml/round_shape"
-                android:contentDescription="@string/send_message"
-                android:elevation="6dp"
-                app:srcCompat="@drawable/ic_camera_grey_24dp"/>
-            <LinearLayout
+                android:id="@+id/emoji_picker"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/ic_insert_emoticon_grey_24dp"
+                android:contentDescription="@string/emoji_picker" />
+
+            <ImageButton
+                android:id="@+id/photoPickerButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/ic_insert_photo_grey_24dp"
+                android:contentDescription="@string/send_image_from_local_storage" />
+
+            <com.vanniktech.emoji.EmojiEditText
+                android:id="@+id/messageEditText"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginEnd="4dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:background="@xml/round_border"
-                android:elevation="4dp"
-                android:orientation="horizontal"
-                android:paddingEnd="8dp"
-                android:paddingStart="8dp"
-                app:layout_constraintEnd_toStartOf="@+id/sendButton"
-                app:layout_constraintStart_toStartOf="parent">
+                android:background="@null"
+                android:hint="@string/type_your_message"
+                android:imeOptions="actionSend"
+                android:inputType="textCapSentences|textMultiLine"
+                android:maxLines="3"
+                android:textSize="18sp" />
 
-                <ImageButton
-                    android:id="@+id/emoji_picker"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:layout_gravity="center_vertical"
-                    android:background="@drawable/ic_insert_emoticon_grey_24dp"
-                    android:contentDescription="@string/emoji_picker" />
-
-                <com.vanniktech.emoji.EmojiEditText
-                    android:id="@+id/messageEditText"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="8dp"
-                    android:background="@null"
-                    android:hint="@string/type_your_message"
-                    android:imeOptions="actionSend"
-                    android:inputType="textCapSentences|textMultiLine"
-                    android:maxLines="3"
-                    android:textSize="18sp" />
-
-                <ImageButton
-                    android:id="@+id/photoPickerButton"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_gravity="center_vertical"
-                    android:background="@drawable/ic_insert_photo_grey_24dp"
-                    android:contentDescription="@string/send_image_from_local_storage" />
-            </LinearLayout>
         </LinearLayout>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/messageRecycleView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/chat_box"
-            android:transcriptMode="alwaysScroll" />
-    </RelativeLayout>
+            android:layout_height="0dp"
+            android:layout_marginBottom="3dp"
+            android:transcriptMode="alwaysScroll"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
