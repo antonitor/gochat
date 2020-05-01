@@ -9,7 +9,6 @@ import com.antonitor.gotchat.model.Message;
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
 import com.antonitor.gotchat.sync.FirebaseStorageRepository;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -22,8 +21,6 @@ public class ChatViewModel extends ViewModel {
 
     private ChatRoom chatRoom;
     private boolean imageChosen;
-    private Uri localImageUri;
-    private Bitmap bitmap;
     private MutableLiveData<String> imageUrl = new MutableLiveData<>();
     private MutableLiveData<Double> uploadProgress = new MutableLiveData<>();
     private MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
@@ -32,7 +29,7 @@ public class ChatViewModel extends ViewModel {
         FirebaseDatabaseRepository.getInstance().postMessage(message);
     }
 
-    void uploadImage(StorageReference reference) {
+    void uploadImage(StorageReference reference, Uri localImageUri, Bitmap bitmap) {
         if (bitmap != null) {
             UploadTask upTask = FirebaseStorageRepository.getInstance().uploadBitmap(bitmap, reference);
             upTask.addOnSuccessListener(taskSnapshot -> {
@@ -97,22 +94,6 @@ public class ChatViewModel extends ViewModel {
 
     void setImageChosen() {
         this.imageChosen = true;
-    }
-
-    public Bitmap getBitmap() {
-        return bitmap;
-    }
-
-    void setBitmap(Bitmap bitmap) {
-        this.bitmap = bitmap;
-    }
-
-    Uri getLocalImageUri() {
-        return localImageUri;
-    }
-
-    void setLocalImageUri(Uri localImageUri) {
-        this.localImageUri = localImageUri;
     }
 
     ChatRoom getChatRoom() {

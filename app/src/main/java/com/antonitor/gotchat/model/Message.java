@@ -10,19 +10,23 @@ import androidx.databinding.BindingAdapter;
 
 public class Message {
 
+    private String messageUUID;
     private String roomID;
     private String text;
     private String author;
+    private boolean hasImage;
     private String photoUrl;
     private Object timeStamp;
 
     public Message() {
     }
 
-    public Message(String roomId, String text, String author, String photoUrl) {
+    public Message(String messageUUID, String roomId, String author, String text, boolean hasImage, String photoUrl) {
+        this.messageUUID = messageUUID;
         this.roomID = roomId;
         this.text = text;
         this.author = author;
+        this.hasImage = hasImage;
         this.photoUrl = photoUrl;
         this.timeStamp = ServerValue.TIMESTAMP;
     }
@@ -77,5 +81,21 @@ public class Message {
     @BindingAdapter("android:visibility")
     public static void setVisibility(View view, Boolean value) {
         view.setVisibility(value ? View.VISIBLE : View.GONE);
+    }
+
+    public String getMessageUUID() {
+        return messageUUID;
+    }
+
+    public void setMessageUUID(String messageUUID) {
+        this.messageUUID = messageUUID;
+    }
+
+    public boolean hasImage() {
+        return hasImage;
+    }
+
+    public void setHasImage(boolean image) {
+        this.hasImage = image;
     }
 }

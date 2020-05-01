@@ -1,5 +1,6 @@
 package com.antonitor.gotchat.sync;
 
+import android.provider.ContactsContract;
 import android.util.Log;
 
 import com.antonitor.gotchat.model.ChatRoom;
@@ -13,6 +14,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.HashMap;
 
@@ -37,7 +39,7 @@ public class FirebaseDatabaseRepository {
 
     private FirebaseDatabaseRepository(){
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        chatroomsReference = mFirebaseDatabase.getReference().child(CHATROOMS_REF);
+        chatroomsReference = mFirebaseDatabase.getReference ().child(CHATROOMS_REF);
         userChatsReference = mFirebaseDatabase.getReference().child(USER_CHATS);
         messageReference = mFirebaseDatabase.getReference().child(MESSAGES_REF);
     }
@@ -100,9 +102,15 @@ public class FirebaseDatabaseRepository {
         });
     }
 
-    public void postMessage(Message message) {
-                String roomID = message.getRoomID();
-        messageReference.child(roomID).push().setValue(message);
+    public Message postMessage(Message message) {
+        String key = messageReference.child(message.getRoomID()).push().getKey();
+        messageReference.child(message.getRoomID()).child(key).setValue(message);
+        message.setMessageUUID(key);
+        return message;
+    }
+
+    public void setImageMessage(Message message) {
+        messageReference.child(message.getRoomID()).child(message.getMessageUUID()).setValue(message);
     }
 
     private Query getTrendingRoomsQuery(){

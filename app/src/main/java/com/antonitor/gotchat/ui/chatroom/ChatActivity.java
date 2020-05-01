@@ -1,12 +1,15 @@
 package com.antonitor.gotchat.ui.chatroom;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
@@ -19,6 +22,11 @@ import com.antonitor.gotchat.databinding.ActivityChatRoomBinding;
 import com.antonitor.gotchat.model.Message;
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
 import com.antonitor.gotchat.sync.FirebaseStorageRepository;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.UploadTask;
 import com.vanniktech.emoji.EmojiPopup;
 
 
@@ -50,6 +58,12 @@ public class ChatActivity extends AppCompatActivity
         layoutManager.setStackFromEnd(true);
         dataBinding.messageRecycleView.setAdapter(adapter);
         dataBinding.messageRecycleView.setLayoutManager(layoutManager);
+
+        /*
+        dataBinding.messageRecycleView.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+            if (bottom < oldBottom) layoutManager.smoothScrollToPosition(dataBinding.messageRecycleView, null, adapter.getItemCount());
+        });
+        */
 
         //Handle user imput
         dataBinding.sendButton.setOnClickListener(ChatActivity.this::takePhotoListener);
@@ -92,23 +106,44 @@ public class ChatActivity extends AppCompatActivity
         switch (requestCode) {
             case RC_PHOTO_PICKER:
                 if (resultCode == RESULT_OK) {
-                    viewModel.setLocalImageUri(data.getData());
-                    viewModel.uploadImage(FirebaseStorageRepository.getInstance()
-                            .getMsgImageStorageReference());
-                    viewModel.getImageUrl().observe(this, url -> {
-                        Message message = new Message(viewModel.getChatRoom().getId(),
-                                null,
-                                FirebaseDatabaseRepository.getInstance().getFirebaseUser().getPhoneNumber(),
-                                url);
-                        viewModel.postMessage(message);
+                    Uri localImage = data.getData();
+                    Message tempMsg = new Message(null,
+                            viewModel.getChatRoom().getId(),
+                            FirebaseDatabaseRepository.getInstance().getFirebaseUser().getPhoneNumber(),
+                            null,
+                            true,
+                            null);
+                    Message message= FirebaseDatabaseRepository.getInstance().postMessage(tempMsg);
+                    UploadTask task = FirebaseStorageRepository.getInstance().uploadFromLocal(localImage);
+                    task.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            Task<Uri> urlTask = taskSnapshot.getMetadata().getReference().getDownloadUrl();
+                            while (!urlTask.isSuccessful()) ;
+                            Uri downloadUrl = urlTask.getResult();
+                            message.setPhotoUrl(downloadUrl.toString());
+                            FirebaseDatabaseRepository.getInstance().setImageMessage(message);
+                            Log.v(TAG, "SUCCESFULL BITMAP UPLOAD");
+                            Log.v(TAG, "File: " + taskSnapshot.getMetadata().getName());
+                            Log.v(TAG, "Path: " + taskSnapshot.getMetadata().getPath());
+                            Log.v(TAG, "Size: " + taskSnapshot.getMetadata().getSizeBytes()/1000 + " kb");
+                        }
+                    }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                            Double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                        }
                     });
+
+
                     break;
                 }
             case RC_CAMERA_ACTION:
+                /*
                 if (resultCode == RESULT_OK)  {
                     viewModel.setBitmap((Bitmap) data.getExtras().get("data"));
                     viewModel.uploadImage(FirebaseStorageRepository.getInstance()
-                            .getMsgImageStorageReference());
+                            .getMsgImageStorageReference(), );
                     viewModel.getImageUrl().observe(this, url -> {
                         Message message = new Message(viewModel.getChatRoom().getId(),
                                 null,
@@ -117,6 +152,8 @@ public class ChatActivity extends AppCompatActivity
                         viewModel.postMessage(message);
                     });
                 }
+
+                 */
         }
     }
 
@@ -137,6 +174,20 @@ public class ChatActivity extends AppCompatActivity
 
     }
 
+    private void sendTextListener(View view) {
+        Log.d(TAG, "SEND CLICKED --------------------------------");
+        String text = dataBinding.messageEditText.getText().toString()
+                .replaceFirst("\\s+$", "")
+                .replaceFirst("^\\s+", "");
+        String roomId = viewModel.getChatRoom().getId();
+        String user = FirebaseDatabaseRepository.getInstance().getFirebaseUser()
+                .getPhoneNumber();
+        Message message = new Message(null, roomId, user, text, false,null);
+        dataBinding.messageEditText.setText("");
+        FirebaseDatabaseRepository.getInstance().postMessage(message);
+        dataBinding.messageRecycleView.smoothScrollToPosition(adapter.getItemCount());
+    }
+
     private void sendImageListener(View view) {
         Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
         getIntent.setType("image/*");
@@ -146,19 +197,7 @@ public class ChatActivity extends AppCompatActivity
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent});
         startActivityForResult(chooserIntent, RC_PHOTO_PICKER);
     }
-    private void sendTextListener(View view) {
-        Log.d(TAG, "SEND CLICKED --------------------------------");
-        String text = dataBinding.messageEditText.getText().toString()
-                .replaceFirst("\\s+$", "")
-                .replaceFirst("^\\s+", "");
-        String roomId = viewModel.getChatRoom().getId();
-        String user = FirebaseDatabaseRepository.getInstance().getFirebaseUser()
-                .getPhoneNumber();
-        Message message = new Message(roomId, text, user, null);
-        dataBinding.messageEditText.setText("");
-        viewModel.postMessage(message);
-        dataBinding.messageRecycleView.smoothScrollToPosition(adapter.getItemCount());
-    }
+
     private void takePhotoListener(View view) {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
