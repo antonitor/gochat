@@ -24,11 +24,11 @@ import com.antonitor.gotchat.ui.chatroom.ChatActivity;
 import java.util.Objects;
 
 
-public class RoomsFragmentFollowing extends Fragment implements RecyclerViewAdapterFollowing.OnUnfollowClickListener, RecyclerViewAdapterFollowing.OnTitleClickListener {
+public class RoomsFragmentFollowing extends Fragment implements RoomListAdapter.OnLongClickListener, RoomListAdapter.OnRoomClickListener {
 
     private ViewModel viewModel;
     private FragmentFollowingListBinding mDataBinding;
-    private RecyclerViewAdapterFollowing recyclerViewAdapter;
+    private RoomListAdapter recyclerViewAdapter;
 
     public RoomsFragmentFollowing() {
         // Required empty public constructor
@@ -55,8 +55,8 @@ public class RoomsFragmentFollowing extends Fragment implements RecyclerViewAdap
     }
 
     private void setUpRecyclerView(){
-        recyclerViewAdapter = new RecyclerViewAdapterFollowing(
-                FirebaseDatabaseRepository.getInstance().getFollowedChatRoomListOptions(), this, this);
+        recyclerViewAdapter = new RoomListAdapter(
+                FirebaseDatabaseRepository.getInstance().getFollowedChatRoomListOptions(),  this, this);
         mDataBinding.followingRecyclerview.setAdapter(recyclerViewAdapter);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         //manager.setReverseLayout(true);
@@ -67,21 +67,25 @@ public class RoomsFragmentFollowing extends Fragment implements RecyclerViewAdap
 
 
     @Override
-    public void onUnfollowClicked(ChatRoom room) {
-        FirebaseDatabaseRepository.getInstance().unFollowChat(room);
-    }
-
-    @Override
-    public void onTitleClicked(ChatRoom room) {
-        Intent chatIntent = new Intent(getActivity(), ChatActivity.class);
-        chatIntent.putExtra("", (Parcelable) room);
-        getActivity().startActivity(chatIntent);
-    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
         if (recyclerViewAdapter != null)
             recyclerViewAdapter.stopListening();
+    }
+
+    @Override
+    public void onLongClick(ChatRoom room) {
+
+
+
+
+        // FirebaseDatabaseRepository.getInstance().unFollowChat(room);
+    }
+
+    @Override
+    public void onRoomClicked(ChatRoom room) {
+        Intent chatIntent = new Intent(getActivity(), ChatActivity.class);
+        chatIntent.putExtra(getString(R.string.key_chatroom), (Parcelable) room);
+        getActivity().startActivity(chatIntent);
     }
 }

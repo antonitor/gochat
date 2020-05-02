@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,11 +24,11 @@ import com.antonitor.gotchat.ui.chatroom.ChatActivity;
  * Use the {@link RoomsFragmentTrending#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RoomsFragmentTrending extends Fragment implements RecyclerViewAdapterTrending.OnFollowClickListener, RecyclerViewAdapterTrending.OnTitleClickListener {
+public class RoomsFragmentTrending extends Fragment implements RoomListAdapter.OnRoomClickListener, RoomListAdapter.OnLongClickListener {
 
     private ViewModel viewModel;
     private FragmentTrendigListBinding mDataBinding;
-    private RecyclerViewAdapterTrending recyclerViewAdapter;
+    private RoomListAdapter recyclerViewAdapter;
 
     public RoomsFragmentTrending() {
         // Required empty public constructor
@@ -57,7 +56,7 @@ public class RoomsFragmentTrending extends Fragment implements RecyclerViewAdapt
     }
 
     private void setUpRecyclerView(){
-        recyclerViewAdapter = new RecyclerViewAdapterTrending(
+        recyclerViewAdapter = new RoomListAdapter(
                 FirebaseDatabaseRepository.getInstance().getTrendingChatRoomListOptions(),
                 this, this);
         mDataBinding.trendingRecyclerview.setAdapter(recyclerViewAdapter);
@@ -68,23 +67,22 @@ public class RoomsFragmentTrending extends Fragment implements RecyclerViewAdapt
         recyclerViewAdapter.startListening();
     }
 
-
-    @Override
-    public void onFollowClicked(ChatRoom room) {
-        FirebaseDatabaseRepository.getInstance().addFollowingChat(room);
-    }
-
-    @Override
-    public void onTitleClicked(ChatRoom room) {
-        Intent chatIntent = new Intent(getActivity(), ChatActivity.class);
-        chatIntent.putExtra(getString(R.string.key_chatroom), room);
-        getActivity().startActivity(chatIntent);
-    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         if (recyclerViewAdapter != null)
             recyclerViewAdapter.stopListening();
+    }
+
+    @Override
+    public void onLongClick(ChatRoom room) {
+        //         FirebaseDatabaseRepository.getInstance().addFollowingChat(room);
+    }
+
+    @Override
+    public void onRoomClicked(ChatRoom room) {
+        Intent chatIntent = new Intent(getActivity(), ChatActivity.class);
+        chatIntent.putExtra(getString(R.string.key_chatroom), room);
+        getActivity().startActivity(chatIntent);
     }
 }

@@ -25,11 +25,11 @@ import com.antonitor.gotchat.ui.chatroom.ChatActivity;
  * Use the {@link RoomsFragmentOwn#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RoomsFragmentOwn extends Fragment implements RecyclerViewAdapterOwn.OnCloseClickListener, RecyclerViewAdapterOwn.OnTitleClickListener {
+public class RoomsFragmentOwn extends Fragment implements RoomListAdapter.OnLongClickListener, RoomListAdapter.OnRoomClickListener {
 
     private ViewModel viewModel;
     private FragmentOwnRoomsBinding mDataBinding;
-    private RecyclerViewAdapterOwn recyclerViewAdapter;
+    private RoomListAdapter recyclerViewAdapter;
 
     public RoomsFragmentOwn() {}
 
@@ -61,7 +61,7 @@ public class RoomsFragmentOwn extends Fragment implements RecyclerViewAdapterOwn
     }
 
     private void setUpRecyclerView(){
-        recyclerViewAdapter = new RecyclerViewAdapterOwn(
+        recyclerViewAdapter = new RoomListAdapter(
                 FirebaseDatabaseRepository.getInstance().getOwnChatRoomListOptions(), this, this);
         mDataBinding.ownRecyclerview.setAdapter(recyclerViewAdapter);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
@@ -71,21 +71,21 @@ public class RoomsFragmentOwn extends Fragment implements RecyclerViewAdapterOwn
 
 
     @Override
-    public void onCloseClicked(ChatRoom room) {
-        FirebaseDatabaseRepository.getInstance().removeChatRoom(room.getId());
-    }
-
-    @Override
-    public void onTitleClicked(ChatRoom room) {
-        Intent chatIntent = new Intent(getActivity(), ChatActivity.class);
-        chatIntent.putExtra("", (Parcelable) room);
-        getActivity().startActivity(chatIntent);
-    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
         if (recyclerViewAdapter != null)
             recyclerViewAdapter.stopListening();
+    }
+
+    @Override
+    public void onLongClick(ChatRoom room) {
+        //        FirebaseDatabaseRepository.getInstance().removeChatRoom(room.getId());
+    }
+
+    @Override
+    public void onRoomClicked(ChatRoom room) {
+        Intent chatIntent = new Intent(getActivity(), ChatActivity.class);
+        chatIntent.putExtra(getString(R.string.key_chatroom), (Parcelable) room);
+        getActivity().startActivity(chatIntent);
     }
 }

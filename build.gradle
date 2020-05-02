@@ -1,5 +1,5 @@
 ext {
-    var = 'C:\\Users\\Toni\\Desktop\\gotchat\\keystore.jks'
+    var = "rootDir/keystore.jks"
 }// Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {

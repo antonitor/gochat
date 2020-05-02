@@ -13,20 +13,20 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class RecyclerViewAdapterTrending extends FirebaseRecyclerAdapter {
+public class RoomListAdapter extends FirebaseRecyclerAdapter {
 
-    private OnFollowClickListener onClickListener;
-    private OnTitleClickListener onTitleClickListener;
+    private OnLongClickListener onLongClickListener;
+    private OnRoomClickListener onRoomClickListener;
     private ItemRoomBinding itemBinding;
 
-    public interface OnFollowClickListener {
-        void onFollowClicked(ChatRoom room);
+    public interface OnLongClickListener {
+        void onLongClick(ChatRoom room);
     }
 
-    public RecyclerViewAdapterTrending(@NonNull FirebaseRecyclerOptions options, OnFollowClickListener onFollowClickListener, OnTitleClickListener onTitleClickListener) {
+    public RoomListAdapter(@NonNull FirebaseRecyclerOptions options, OnLongClickListener onLongClickListener, OnRoomClickListener onRoomClickListener) {
         super(options);
-        this.onClickListener = onFollowClickListener;
-        this.onTitleClickListener = onTitleClickListener;
+        this.onLongClickListener = onLongClickListener;
+        this.onRoomClickListener = onRoomClickListener;
     }
 
     @Override
@@ -37,13 +37,13 @@ public class RecyclerViewAdapterTrending extends FirebaseRecyclerAdapter {
         roomViewHolder.bind(room);
         roomViewHolder.itemBinding.setImage(room.getImageUrl());
         roomViewHolder.itemBinding.followButton
-                .setOnClickListener(view -> onClickListener.onFollowClicked(room));
+                .setOnClickListener(view -> onLongClickListener.onLongClick(room));
         roomViewHolder.itemBinding.tvTitle
-                .setOnClickListener(view -> onTitleClickListener.onTitleClicked(room));
+                .setOnClickListener(view -> onRoomClickListener.onRoomClicked(room));
     }
 
-    public interface OnTitleClickListener {
-        void onTitleClicked(ChatRoom room);
+    public interface OnRoomClickListener {
+        void onRoomClicked(ChatRoom room);
     }
 
     @NonNull
