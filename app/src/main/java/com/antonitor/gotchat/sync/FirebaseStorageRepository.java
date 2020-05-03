@@ -14,8 +14,7 @@ public class FirebaseStorageRepository {
 
     private static final String LOG_TAG = FirebaseDatabaseRepository.class.getSimpleName();
     private static final Object LOCK = new Object();
-    private static final String ROOM_IMAGE = "chatroom_images";
-    private static final String MESSAGE_IMAGE = "message_images";
+
     private static FirebaseStorageRepository sInstance;
     private FirebaseStorage firebaseStorage;
     private StorageReference roomImageStorageReference;
@@ -24,8 +23,8 @@ public class FirebaseStorageRepository {
 
     private FirebaseStorageRepository(){
         firebaseStorage = FirebaseStorage.getInstance();
-        roomImageStorageReference = firebaseStorage.getReference(ROOM_IMAGE);
-        msgImageStorageReference = firebaseStorage.getReference(MESSAGE_IMAGE);
+        roomImageStorageReference = firebaseStorage.getReference(FirebaseContract.ROOM_IMAGE_REF);
+        msgImageStorageReference = firebaseStorage.getReference(FirebaseContract.MESSAGE_IMAGE_REF);
     }
 
     public static FirebaseStorageRepository getInstance() {
@@ -42,11 +41,11 @@ public class FirebaseStorageRepository {
     }
     public StorageReference getMsgImageStorageReference() { return msgImageStorageReference; }
 
-    public UploadTask uploadBitmap(Bitmap bitmap, StorageReference refernce) {
+    public UploadTask uploadBitmap(Bitmap bitmap, StorageReference reference) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         final String randomName = "image-"+ (new Date().getTime());
-        final StorageReference pictureRef = refernce.child(randomName +".jpg");
+        final StorageReference pictureRef = reference.child(randomName +".jpg");
         return pictureRef.putBytes(baos.toByteArray());
     }
 

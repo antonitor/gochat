@@ -25,7 +25,7 @@ import com.antonitor.gotchat.ui.chatroom.ChatActivity;
  * Use the {@link RoomsFragmentOwn#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RoomsFragmentOwn extends Fragment implements RoomListAdapter.OnLongClickListener, RoomListAdapter.OnRoomClickListener {
+public class RoomsFragmentOwn extends Fragment implements RoomListAdapter.OnRoomClickListener {
 
     private ViewModel viewModel;
     private FragmentOwnRoomsBinding mDataBinding;
@@ -62,7 +62,7 @@ public class RoomsFragmentOwn extends Fragment implements RoomListAdapter.OnLong
 
     private void setUpRecyclerView(){
         recyclerViewAdapter = new RoomListAdapter(
-                FirebaseDatabaseRepository.getInstance().getOwnChatRoomListOptions(), this, this);
+                FirebaseDatabaseRepository.getInstance().getOwnChatRoomListOptions(), this);
         mDataBinding.ownRecyclerview.setAdapter(recyclerViewAdapter);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         mDataBinding.ownRecyclerview.setLayoutManager(manager);
@@ -75,11 +75,6 @@ public class RoomsFragmentOwn extends Fragment implements RoomListAdapter.OnLong
         super.onDestroyView();
         if (recyclerViewAdapter != null)
             recyclerViewAdapter.stopListening();
-    }
-
-    @Override
-    public void onLongClick(ChatRoom room) {
-        //        FirebaseDatabaseRepository.getInstance().removeChatRoom(room.getId());
     }
 
     @Override

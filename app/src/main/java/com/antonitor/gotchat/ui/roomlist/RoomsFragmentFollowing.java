@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModel;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.os.Parcelable;
 import android.view.LayoutInflater;
+
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -24,7 +26,7 @@ import com.antonitor.gotchat.ui.chatroom.ChatActivity;
 import java.util.Objects;
 
 
-public class RoomsFragmentFollowing extends Fragment implements RoomListAdapter.OnLongClickListener, RoomListAdapter.OnRoomClickListener {
+public class RoomsFragmentFollowing extends Fragment implements  RoomListAdapter.OnRoomClickListener {
 
     private ViewModel viewModel;
     private FragmentFollowingListBinding mDataBinding;
@@ -56,11 +58,9 @@ public class RoomsFragmentFollowing extends Fragment implements RoomListAdapter.
 
     private void setUpRecyclerView(){
         recyclerViewAdapter = new RoomListAdapter(
-                FirebaseDatabaseRepository.getInstance().getFollowedChatRoomListOptions(),  this, this);
+                FirebaseDatabaseRepository.getInstance().getFollowedChatRoomListOptions(),   this);
         mDataBinding.followingRecyclerview.setAdapter(recyclerViewAdapter);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
-        //manager.setReverseLayout(true);
-        //manager.setStackFromEnd(true);
         mDataBinding.followingRecyclerview.setLayoutManager(manager);
         recyclerViewAdapter.startListening();
     }
@@ -73,14 +73,6 @@ public class RoomsFragmentFollowing extends Fragment implements RoomListAdapter.
             recyclerViewAdapter.stopListening();
     }
 
-    @Override
-    public void onLongClick(ChatRoom room) {
-
-
-
-
-        // FirebaseDatabaseRepository.getInstance().unFollowChat(room);
-    }
 
     @Override
     public void onRoomClicked(ChatRoom room) {

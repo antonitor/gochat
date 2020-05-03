@@ -14,21 +14,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.UploadTask;
 
 import java.util.HashMap;
 
 import androidx.annotation.NonNull;
-
 public class FirebaseDatabaseRepository {
 
     private static final String LOG_TAG = FirebaseDatabaseRepository.class.getSimpleName();
     private static FirebaseDatabaseRepository sInstance;
     private static final Object LOCK = new Object();
-
-    private static final String CHATROOMS_REF = "chatrooms";
-    private static final String MESSAGES_REF = "messages";
-    private static final String USER_CHATS = "userchats";
 
     private FirebaseUser firebaseUser;
     private User userChatRooms;
@@ -39,9 +33,9 @@ public class FirebaseDatabaseRepository {
 
     private FirebaseDatabaseRepository(){
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        chatroomsReference = mFirebaseDatabase.getReference ().child(CHATROOMS_REF);
-        userChatsReference = mFirebaseDatabase.getReference().child(USER_CHATS);
-        messageReference = mFirebaseDatabase.getReference().child(MESSAGES_REF);
+        chatroomsReference = mFirebaseDatabase.getReference ().child(FirebaseContract.CHATROOMS_REF);
+        userChatsReference = mFirebaseDatabase.getReference().child(FirebaseContract.USER_REF);
+        messageReference = mFirebaseDatabase.getReference().child(FirebaseContract.MESSAGES_REF);
     }
 
     public static FirebaseDatabaseRepository getInstance() {
@@ -76,19 +70,19 @@ public class FirebaseDatabaseRepository {
     private void addOwnChatRoom(ChatRoom room) {
         String userUid = firebaseUser.getUid();
         userChatRooms.getOwnChatRooms().put(room.getId(), room);
-        userChatsReference.child(userUid).child("ownChatRooms").setValue(userChatRooms.getOwnChatRooms());
+        userChatsReference.child(userUid).child(FirebaseContract.OWN_ROOMS_REF).setValue(userChatRooms.getOwnChatRooms());
     }
 
     public void addFollowingChat(ChatRoom room) {
         String userUid = firebaseUser.getUid();
         userChatRooms.getFollowedChatRooms().put(room.getId(), room);
-        userChatsReference.child(userUid).child("followedChatRooms").setValue(userChatRooms.getFollowedChatRooms());
+        userChatsReference.child(userUid).child(FirebaseContract.FOLLOWED_ROOMS_REF).setValue(userChatRooms.getFollowedChatRooms());
     }
 
     public void unFollowChat(ChatRoom room) {
         String userUid = firebaseUser.getUid();
         userChatRooms.getFollowedChatRooms().remove(room.getId());
-        userChatsReference.child(userUid).child("followedChatRooms").child(room.getId()).removeValue();
+        userChatsReference.child(userUid).child(FirebaseContract.FOLLOWED_ROOMS_REF).child(room.getId()).removeValue();
     }
 
     public void removeChatRoom(String roomID) {
@@ -96,8 +90,8 @@ public class FirebaseDatabaseRepository {
         chatroomsReference.child(roomID).removeValue((databaseError, databaseReference) -> {
             userChatRooms.getOwnChatRooms().remove(roomID);
             userChatRooms.getFollowedChatRooms().remove(roomID);
-            userChatsReference.child(userUid).child("ownChatRooms").child(roomID).removeValue();
-            userChatsReference.child(userUid).child("followedChatRooms").child(roomID).removeValue();
+            userChatsReference.child(userUid).child(FirebaseContract.OWN_ROOMS_REF).child(roomID).removeValue();
+            userChatsReference.child(userUid).child(FirebaseContract.FOLLOWED_ROOMS_REF).child(roomID).removeValue();
             messageReference.child(roomID).removeValue();
         });
     }
@@ -114,15 +108,19 @@ public class FirebaseDatabaseRepository {
     }
 
     private Query getTrendingRoomsQuery(){
-        return mFirebaseDatabase.getReference().child(CHATROOMS_REF);
+        return mFirebaseDatabase.getReference().child(FirebaseContract.CHATROOMS_REF);
     }
 
     private Query getFollowingRoomsQuery(){
-        return userChatsReference.child(firebaseUser.getUid()).child("followedChatRooms");
+        return userChatsReference.child(firebaseUser.getUid()).child(FirebaseContract.FOLLOWED_ROOMS_REF);
     }
 
     private Query getOwnChatRoomsQuery(){
-        return userChatsReference.child(firebaseUser.getUid()).child("ownChatRooms");
+        return userChatsReference.child(firebaseUser.getUid()).child(FirebaseContract.OWN_ROOMS_REF);
+    }
+
+    private Query getMessageListQuery(String roomId){
+        return messageReference.child(roomId);
     }
 
     public FirebaseRecyclerOptions<ChatRoom> getTrendingChatRoomListOptions(){
@@ -143,9 +141,7 @@ public class FirebaseDatabaseRepository {
                 .build();
     }
 
-    private Query getMessageListQuery(String roomId){
-        return messageReference.child(roomId);
-    }
+
 
     public FirebaseRecyclerOptions<Message> getMessageListOptions(String roomID){
         return new FirebaseRecyclerOptions.Builder<Message>()

@@ -3,6 +3,7 @@ package com.antonitor.gotchat.ui.roomlist;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModel;
@@ -10,6 +11,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -24,11 +28,12 @@ import com.antonitor.gotchat.ui.chatroom.ChatActivity;
  * Use the {@link RoomsFragmentTrending#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RoomsFragmentTrending extends Fragment implements RoomListAdapter.OnRoomClickListener, RoomListAdapter.OnLongClickListener {
+public class RoomsFragmentTrending extends Fragment implements RoomListAdapter.OnRoomClickListener{
 
     private ViewModel viewModel;
     private FragmentTrendigListBinding mDataBinding;
     private RoomListAdapter recyclerViewAdapter;
+    private boolean roomSelected = false;
 
     public RoomsFragmentTrending() {
         // Required empty public constructor
@@ -58,13 +63,34 @@ public class RoomsFragmentTrending extends Fragment implements RoomListAdapter.O
     private void setUpRecyclerView(){
         recyclerViewAdapter = new RoomListAdapter(
                 FirebaseDatabaseRepository.getInstance().getTrendingChatRoomListOptions(),
-                this, this);
+                this);
         mDataBinding.trendingRecyclerview.setAdapter(recyclerViewAdapter);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         //manager.setReverseLayout(true);
         //manager.setStackFromEnd(true);
         mDataBinding.trendingRecyclerview.setLayoutManager(manager);
         recyclerViewAdapter.startListening();
+    }
+
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        if (roomSelected)
+            inflater.inflate(R.menu.room_action_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_delete_room:
+                return true;
+            case R.id.menu_follow_room:
+
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -74,10 +100,6 @@ public class RoomsFragmentTrending extends Fragment implements RoomListAdapter.O
             recyclerViewAdapter.stopListening();
     }
 
-    @Override
-    public void onLongClick(ChatRoom room) {
-        //         FirebaseDatabaseRepository.getInstance().addFollowingChat(room);
-    }
 
     @Override
     public void onRoomClicked(ChatRoom room) {
