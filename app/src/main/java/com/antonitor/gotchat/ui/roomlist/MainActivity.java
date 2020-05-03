@@ -11,11 +11,9 @@ import androidx.viewpager.widget.ViewPager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import com.antonitor.gotchat.R;
-import com.antonitor.gotchat.model.ChatRoom;
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
@@ -30,7 +28,6 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity  {
 
-    public static final int RC_NEW_CHAT_ROOM = 2331;
     private static final int RC_SIGN_IN = 1341;
     private static final String TAG = MainActivity.class.getCanonicalName();
 

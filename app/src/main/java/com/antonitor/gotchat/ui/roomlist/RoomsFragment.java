@@ -25,23 +25,23 @@ import com.antonitor.gotchat.ui.chatroom.ChatActivity;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link RoomsFragmentTrending#newInstance} factory method to
+ * Use the {@link RoomsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RoomsFragmentTrending extends Fragment implements RoomListAdapter.OnRoomClickListener{
+public class RoomsFragment extends Fragment implements RoomListAdapter.OnRoomClickListener{
 
     private ViewModel viewModel;
     private FragmentTrendigListBinding mDataBinding;
     private RoomListAdapter recyclerViewAdapter;
     private boolean roomSelected = false;
 
-    public RoomsFragmentTrending() {
+    public RoomsFragment() {
         // Required empty public constructor
     }
 
 
-    static RoomsFragmentTrending newInstance() {
-        return new RoomsFragmentTrending();
+    static RoomsFragment newInstance() {
+        return new RoomsFragment();
     }
 
     @Override

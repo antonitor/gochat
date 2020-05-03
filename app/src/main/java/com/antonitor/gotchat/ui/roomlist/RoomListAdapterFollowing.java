@@ -22,7 +22,7 @@ import androidx.appcompat.view.ActionMode;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class RoomListAdapter extends FirebaseRecyclerAdapter {
+public class RoomListAdapterFollowing extends FirebaseRecyclerAdapter {
 
     private OnRoomClickListener onRoomClickListener;
     private ItemRoomBinding itemBinding;
@@ -32,7 +32,7 @@ public class RoomListAdapter extends FirebaseRecyclerAdapter {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             multiSelect = true;
-            menu.add("Subscribe");
+            menu.add("Unsubscribe");
             return true;
         }
 
@@ -44,7 +44,7 @@ public class RoomListAdapter extends FirebaseRecyclerAdapter {
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             for (ChatRoom room : selectedItems) {
-                FirebaseDatabaseRepository.getInstance().addFollowingChat(room);
+                FirebaseDatabaseRepository.getInstance().unFollowChat(room);
             }
             mode.finish();
             return true;
@@ -63,7 +63,7 @@ public class RoomListAdapter extends FirebaseRecyclerAdapter {
     }
 
 
-    public RoomListAdapter(@NonNull FirebaseRecyclerOptions options, OnRoomClickListener onRoomClickListener) {
+    public RoomListAdapterFollowing(@NonNull FirebaseRecyclerOptions options, OnRoomClickListener onRoomClickListener) {
         super(options);
         this.onRoomClickListener = onRoomClickListener;
     }
@@ -109,13 +109,13 @@ public class RoomListAdapter extends FirebaseRecyclerAdapter {
             itemBinding.executePendingBindings();
         }
 
-        void selectItem(ChatRoom room) {
+        void selectItem(ChatRoom item) {
             if (multiSelect) {
-                if (selectedItems.contains(room)) {
-                    selectedItems.remove(room);
+                if (selectedItems.contains(item)) {
+                    selectedItems.remove(item);
                     itemView.setBackgroundColor(Color.WHITE);
                 } else {
-                    selectedItems.add(room);
+                    selectedItems.add(item);
                     itemView.setBackgroundColor(Color.LTGRAY);
                 }
             }

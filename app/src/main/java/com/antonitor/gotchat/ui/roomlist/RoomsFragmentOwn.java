@@ -25,11 +25,11 @@ import com.antonitor.gotchat.ui.chatroom.ChatActivity;
  * Use the {@link RoomsFragmentOwn#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RoomsFragmentOwn extends Fragment implements RoomListAdapter.OnRoomClickListener {
+public class RoomsFragmentOwn extends Fragment implements RoomListAdapterOwn.OnRoomClickListener {
 
     private ViewModel viewModel;
     private FragmentOwnRoomsBinding mDataBinding;
-    private RoomListAdapter recyclerViewAdapter;
+    private RoomListAdapterOwn recyclerViewAdapter;
 
     public RoomsFragmentOwn() {}
 
@@ -61,7 +61,7 @@ public class RoomsFragmentOwn extends Fragment implements RoomListAdapter.OnRoom
     }
 
     private void setUpRecyclerView(){
-        recyclerViewAdapter = new RoomListAdapter(
+        recyclerViewAdapter = new RoomListAdapterOwn(
                 FirebaseDatabaseRepository.getInstance().getOwnChatRoomListOptions(), this);
         mDataBinding.ownRecyclerview.setAdapter(recyclerViewAdapter);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());

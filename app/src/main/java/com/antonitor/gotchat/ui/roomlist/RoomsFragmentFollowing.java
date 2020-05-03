@@ -26,11 +26,11 @@ import com.antonitor.gotchat.ui.chatroom.ChatActivity;
 import java.util.Objects;
 
 
-public class RoomsFragmentFollowing extends Fragment implements  RoomListAdapter.OnRoomClickListener {
+public class RoomsFragmentFollowing extends Fragment implements  RoomListAdapterFollowing.OnRoomClickListener {
 
     private ViewModel viewModel;
     private FragmentFollowingListBinding mDataBinding;
-    private RoomListAdapter recyclerViewAdapter;
+    private RoomListAdapterFollowing recyclerViewAdapter;
 
     public RoomsFragmentFollowing() {
         // Required empty public constructor
@@ -57,7 +57,7 @@ public class RoomsFragmentFollowing extends Fragment implements  RoomListAdapter
     }
 
     private void setUpRecyclerView(){
-        recyclerViewAdapter = new RoomListAdapter(
+        recyclerViewAdapter = new RoomListAdapterFollowing(
                 FirebaseDatabaseRepository.getInstance().getFollowedChatRoomListOptions(),   this);
         mDataBinding.followingRecyclerview.setAdapter(recyclerViewAdapter);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());

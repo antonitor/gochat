@@ -20,7 +20,7 @@ public class MainPageAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return RoomsFragmentTrending.newInstance();
+                return RoomsFragment.newInstance();
             case 1:
                 return RoomsFragmentFollowing.newInstance();
             case 2:

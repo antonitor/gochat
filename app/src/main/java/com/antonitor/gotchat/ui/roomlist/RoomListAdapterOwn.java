@@ -22,17 +22,17 @@ import androidx.appcompat.view.ActionMode;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class RoomListAdapter extends FirebaseRecyclerAdapter {
+public class RoomListAdapterOwn extends FirebaseRecyclerAdapter {
 
     private OnRoomClickListener onRoomClickListener;
     private ItemRoomBinding itemBinding;
     private boolean multiSelect = false;
-    private ArrayList<ChatRoom> selectedItems = new ArrayList<ChatRoom>();
+    private ArrayList<String> selectedItems = new ArrayList<String>();
     private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             multiSelect = true;
-            menu.add("Subscribe");
+            menu.add("Delete");
             return true;
         }
 
@@ -43,8 +43,8 @@ public class RoomListAdapter extends FirebaseRecyclerAdapter {
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            for (ChatRoom room : selectedItems) {
-                FirebaseDatabaseRepository.getInstance().addFollowingChat(room);
+            for (String roomID : selectedItems) {
+                FirebaseDatabaseRepository.getInstance().removeChatRoom(roomID);
             }
             mode.finish();
             return true;
@@ -63,7 +63,7 @@ public class RoomListAdapter extends FirebaseRecyclerAdapter {
     }
 
 
-    public RoomListAdapter(@NonNull FirebaseRecyclerOptions options, OnRoomClickListener onRoomClickListener) {
+    public RoomListAdapterOwn(@NonNull FirebaseRecyclerOptions options, OnRoomClickListener onRoomClickListener) {
         super(options);
         this.onRoomClickListener = onRoomClickListener;
     }
@@ -83,7 +83,7 @@ public class RoomListAdapter extends FirebaseRecyclerAdapter {
                         onRoomClickListener.onRoomClicked(room);
                     }
                 });
-        roomViewHolder.update(room);
+        roomViewHolder.update(room.getId());
     }
 
 
@@ -109,20 +109,20 @@ public class RoomListAdapter extends FirebaseRecyclerAdapter {
             itemBinding.executePendingBindings();
         }
 
-        void selectItem(ChatRoom room) {
+        void selectItem(String itemID) {
             if (multiSelect) {
-                if (selectedItems.contains(room)) {
-                    selectedItems.remove(room);
+                if (selectedItems.contains(itemID)) {
+                    selectedItems.remove(itemID);
                     itemView.setBackgroundColor(Color.WHITE);
                 } else {
-                    selectedItems.add(room);
+                    selectedItems.add(itemID);
                     itemView.setBackgroundColor(Color.LTGRAY);
                 }
             }
         }
 
-        void update(final ChatRoom room) {
-            if (selectedItems.contains(room)) {
+        void update(final String roomID) {
+            if (selectedItems.contains(roomID)) {
                 itemView.setBackgroundColor(Color.LTGRAY);
             } else {
                 itemView.setBackgroundColor(Color.WHITE);
@@ -131,7 +131,7 @@ public class RoomListAdapter extends FirebaseRecyclerAdapter {
                 @Override
                 public boolean onLongClick(View view) {
                     ((AppCompatActivity)view.getContext()).startSupportActionMode(actionModeCallbacks);
-                    selectItem(room);
+                    selectItem(roomID);
                     return true;
                 }
             });
