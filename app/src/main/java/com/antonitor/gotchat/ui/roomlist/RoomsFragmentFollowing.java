@@ -58,7 +58,8 @@ public class RoomsFragmentFollowing extends Fragment implements  RoomListAdapter
 
     private void setUpRecyclerView(){
         recyclerViewAdapter = new RoomListAdapterFollowing(
-                FirebaseDatabaseRepository.getInstance().getFollowedChatRoomListOptions(),   this);
+                FirebaseDatabaseRepository.getInstance().getFollowedChatRoomListOptions(),
+                this);
         mDataBinding.followingRecyclerview.setAdapter(recyclerViewAdapter);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         mDataBinding.followingRecyclerview.setLayoutManager(manager);

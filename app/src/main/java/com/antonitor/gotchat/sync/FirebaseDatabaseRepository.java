@@ -97,13 +97,23 @@ public class FirebaseDatabaseRepository {
     }
 
     public Message postMessage(Message message) {
-        String key = messageReference.child(message.getRoomID()).push().getKey();
-        messageReference.child(message.getRoomID()).child(key).setValue(message);
-        message.setMessageUUID(key);
+        messageReference.child(message.getRoomID()).push().addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String key = dataSnapshot.getKey();
+                messageReference.child(message.getRoomID()).child(key).setValue(message);
+                message.setMessageUUID(key);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                
+            }
+        });
         return message;
     }
 
-    public void setImageMessage(Message message) {
+    public void updateMessage(Message message) {
         messageReference.child(message.getRoomID()).child(message.getMessageUUID()).setValue(message);
     }
 

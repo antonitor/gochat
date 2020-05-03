@@ -3,12 +3,10 @@ package com.antonitor.gotchat.ui.chatroom;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -24,21 +22,19 @@ import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
 import com.antonitor.gotchat.sync.FirebaseStorageRepository;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.UploadTask;
 import com.vanniktech.emoji.EmojiPopup;
 
 
-public class ChatActivity extends AppCompatActivity
-        implements ChatRecyclerViewAdapter.OnMessageClickListener{
+public class ChatActivity extends AppCompatActivity {
 
     private static final String TAG = "CHAT_ACTIVITY";
     private static final int RC_PHOTO_PICKER = 1985;
     private static final int RC_CAMERA_ACTION = 2020;
     ActivityChatRoomBinding dataBinding;
     ChatViewModel viewModel;
-    ChatRecyclerViewAdapter adapter;
+    ChatAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,14 +42,15 @@ public class ChatActivity extends AppCompatActivity
         dataBinding = DataBindingUtil.setContentView(this, R.layout.activity_chat_room);
         viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
         viewModel.setChatRoom(getIntent().getExtras().getParcelable(getString(R.string.key_chatroom)));
+        setTitle(viewModel.getChatRoom().getTitle());
 
         EmojiPopup emojiPopup = EmojiPopup.Builder.fromRootView(dataBinding.getRoot())
                 .build(dataBinding.messageEditText);
         dataBinding.emojiPicker.setOnClickListener(view -> emojiPopup.toggle());
 
         //Set up RecyclerView
-        adapter = new ChatRecyclerViewAdapter(FirebaseDatabaseRepository.getInstance()
-                .getMessageListOptions(viewModel.getChatRoom().getId()), this);
+        adapter = new ChatAdapter(FirebaseDatabaseRepository.getInstance()
+                .getMessageListOptions(viewModel.getChatRoom().getId()));
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         dataBinding.messageRecycleView.setAdapter(adapter);
@@ -107,11 +104,12 @@ public class ChatActivity extends AppCompatActivity
             case RC_PHOTO_PICKER:
                 if (resultCode == RESULT_OK) {
                     Uri localImage = data.getData();
-                    Message tempMsg = new Message(null,
+                    Message tempMsg = new Message(
+                            null,
                             viewModel.getChatRoom().getId(),
                             FirebaseDatabaseRepository.getInstance().getFirebaseUser().getPhoneNumber(),
                             null,
-                            true,
+                            localImage.toString(),
                             null);
                     Message message= FirebaseDatabaseRepository.getInstance().postMessage(tempMsg);
                     UploadTask task = FirebaseStorageRepository.getInstance().uploadFromLocal(localImage);
@@ -122,7 +120,7 @@ public class ChatActivity extends AppCompatActivity
                             while (!urlTask.isSuccessful()) ;
                             Uri downloadUrl = urlTask.getResult();
                             message.setPhotoUrl(downloadUrl.toString());
-                            FirebaseDatabaseRepository.getInstance().setImageMessage(message);
+                            FirebaseDatabaseRepository.getInstance().updateMessage(message);
                             Log.v(TAG, "SUCCESFULL BITMAP UPLOAD");
                             Log.v(TAG, "File: " + taskSnapshot.getMetadata().getName());
                             Log.v(TAG, "Path: " + taskSnapshot.getMetadata().getPath());
@@ -169,11 +167,6 @@ public class ChatActivity extends AppCompatActivity
         adapter.stopListening();
     }
 
-    @Override
-    public void onMessageClicked(Message message) {
-
-    }
-
     private void sendTextListener(View view) {
         Log.d(TAG, "SEND CLICKED --------------------------------");
         String text = dataBinding.messageEditText.getText().toString()
@@ -182,7 +175,7 @@ public class ChatActivity extends AppCompatActivity
         String roomId = viewModel.getChatRoom().getId();
         String user = FirebaseDatabaseRepository.getInstance().getFirebaseUser()
                 .getPhoneNumber();
-        Message message = new Message(null, roomId, user, text, false,null);
+        Message message = new Message(null, roomId, user, text, null,null);
         dataBinding.messageEditText.setText("");
         FirebaseDatabaseRepository.getInstance().postMessage(message);
         dataBinding.messageRecycleView.smoothScrollToPosition(adapter.getItemCount());
