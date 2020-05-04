@@ -1,6 +1,5 @@
 package com.antonitor.gotchat.ui.chatroom;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -19,11 +18,7 @@ import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.ActivityChatRoomBinding;
 import com.antonitor.gotchat.model.Message;
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
-import com.antonitor.gotchat.sync.FirebaseStorageRepository;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.storage.OnProgressListener;
-import com.google.firebase.storage.UploadTask;
+import com.antonitor.gotchat.sync.FirebaseAuthRepository;
 import com.vanniktech.emoji.EmojiPopup;
 
 
@@ -55,12 +50,6 @@ public class ChatActivity extends AppCompatActivity {
         layoutManager.setStackFromEnd(true);
         dataBinding.messageRecycleView.setAdapter(adapter);
         dataBinding.messageRecycleView.setLayoutManager(layoutManager);
-
-        /*
-        dataBinding.messageRecycleView.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
-            if (bottom < oldBottom) layoutManager.smoothScrollToPosition(dataBinding.messageRecycleView, null, adapter.getItemCount());
-        });
-        */
 
         //Handle user imput
         dataBinding.sendButton.setOnClickListener(ChatActivity.this::takePhotoListener);
@@ -107,33 +96,11 @@ public class ChatActivity extends AppCompatActivity {
                     Message tempMsg = new Message(
                             null,
                             viewModel.getChatRoom().getId(),
-                            FirebaseDatabaseRepository.getInstance().getFirebaseUser().getPhoneNumber(),
+                            FirebaseAuthRepository.getInstance().getFirebaseUser().getPhoneNumber(),
                             null,
                             localImage.toString(),
                             null);
                     Message message= FirebaseDatabaseRepository.getInstance().postMessage(tempMsg);
-                    UploadTask task = FirebaseStorageRepository.getInstance().uploadFromLocal(localImage);
-                    task.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            Task<Uri> urlTask = taskSnapshot.getMetadata().getReference().getDownloadUrl();
-                            while (!urlTask.isSuccessful()) ;
-                            Uri downloadUrl = urlTask.getResult();
-                            message.setPhotoUrl(downloadUrl.toString());
-                            FirebaseDatabaseRepository.getInstance().updateMessage(message);
-                            Log.v(TAG, "SUCCESFULL BITMAP UPLOAD");
-                            Log.v(TAG, "File: " + taskSnapshot.getMetadata().getName());
-                            Log.v(TAG, "Path: " + taskSnapshot.getMetadata().getPath());
-                            Log.v(TAG, "Size: " + taskSnapshot.getMetadata().getSizeBytes()/1000 + " kb");
-                        }
-                    }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                            Double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                        }
-                    });
-
-
                     break;
                 }
             case RC_CAMERA_ACTION:
@@ -173,7 +140,7 @@ public class ChatActivity extends AppCompatActivity {
                 .replaceFirst("\\s+$", "")
                 .replaceFirst("^\\s+", "");
         String roomId = viewModel.getChatRoom().getId();
-        String user = FirebaseDatabaseRepository.getInstance().getFirebaseUser()
+        String user = FirebaseAuthRepository.getInstance().getFirebaseUser()
                 .getPhoneNumber();
         Message message = new Message(null, roomId, user, text, null,null);
         dataBinding.messageEditText.setText("");

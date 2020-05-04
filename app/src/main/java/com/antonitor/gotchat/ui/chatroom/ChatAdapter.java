@@ -1,6 +1,8 @@
 package com.antonitor.gotchat.ui.chatroom;
 
 import android.graphics.Color;
+import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,9 +13,15 @@ import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.MessageChatBinding;
 import com.antonitor.gotchat.model.Message;
 
+import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
+import com.antonitor.gotchat.sync.FirebaseStorageRepository;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.UploadTask;
 
 
 import java.util.ArrayList;
@@ -26,7 +34,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class ChatAdapter extends FirebaseRecyclerAdapter {
 
-    private static final String TAG = "CHAT_RECYCLER_VIEW";
+    private static final String TAG = "CHAT_ADAPTER";
     private ArrayList<Message> selectedItems = new ArrayList<Message>();
     private boolean multiSelect = false;
     private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
@@ -69,10 +77,14 @@ public class ChatAdapter extends FirebaseRecyclerAdapter {
         Message message = (Message) model;
         MessageViewHolder viewHolder = (MessageViewHolder) holder;
         viewHolder.bind(message);
-        Glide.with(viewHolder.dataBinding.photoImageView.getContext())
-                .load(message.getLocalPhotoUrl())
-                .into(viewHolder.dataBinding.photoImageView);
-
+        if (message.getLocalPhotoUrl()!= null) {
+            Glide.with(viewHolder.dataBinding.photoImageView.getContext())
+                    .load(message.getLocalPhotoUrl())
+                    .into(viewHolder.dataBinding.photoImageView);
+            if (message.getPhotoUrl()== null) {
+                viewHolder.uploadImage(message);
+            }
+         }
 
         viewHolder.dataBinding.authorTv.setOnClickListener(view -> {
             if (multiSelect) {
@@ -144,7 +156,29 @@ public class ChatAdapter extends FirebaseRecyclerAdapter {
         }
 
         void uploadImage(Message message){
-
+            Uri localImageURI = Uri.parse(message.getLocalPhotoUrl());
+            UploadTask task = FirebaseStorageRepository.getInstance().uploadFromLocal(localImageURI);
+            task.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    dataBinding.progressBarPictureUpload.setVisibility(View.GONE);
+                    Uri downloadUrl = task.getResult().getUploadSessionUri();
+                    message.setPhotoUrl(downloadUrl.toString());
+                    FirebaseDatabaseRepository.getInstance().updateMessage(message);
+                    Log.v(TAG, "SUCCESSFUL BITMAP UPLOAD");
+                    Log.v(TAG, "File: " + task.getResult().getMetadata().getName());
+                    Log.v(TAG, "Path: " + task.getResult().getMetadata().getPath());
+                    Log.v(TAG, "Size: " + task.getResult().getMetadata().getSizeBytes()/1000 + " kb");
+                }
+            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                    Double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                    if (progress > 0 && progress < 10)
+                        dataBinding.progressBarPictureUpload.setVisibility(View.VISIBLE);
+                    dataBinding.progressBarPictureUpload.setProgress(progress.intValue());
+                }
+            });
         }
 
     }
