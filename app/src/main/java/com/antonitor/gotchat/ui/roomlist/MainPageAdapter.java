@@ -9,9 +9,9 @@ import androidx.fragment.app.FragmentPagerAdapter;
 public class MainPageAdapter extends FragmentPagerAdapter {
 
     private static final int NUM_ITEMS = 3;
-    private String[] tabTitles = new String[]{"TRENDING", "FOLLOWINNG", "OWNER"};
+    private final String[] tabTitles = new String[]{"TRENDING", "FOLLOWING", "OWNER"};
 
-    public MainPageAdapter(@NonNull FragmentManager fm, int behavior) {
+    MainPageAdapter(@NonNull FragmentManager fm, int behavior) {
         super(fm, behavior);
     }
 

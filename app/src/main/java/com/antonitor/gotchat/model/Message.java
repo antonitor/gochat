@@ -1,10 +1,10 @@
 package com.antonitor.gotchat.model;
 
-import android.net.Uri;
-import android.view.View;
+
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.database.ServerValue;
 
 import androidx.databinding.BindingAdapter;
@@ -88,8 +88,17 @@ public class Message {
         this.timeStamp = timeStamp;
     }
 
+    /*
     @BindingAdapter("android:visibility")
     public static void setVisibility(View view, Boolean value) {
         view.setVisibility(value ? View.VISIBLE : View.GONE);
+    }
+     */
+
+    @BindingAdapter("messageImage")
+    public static void loadImage(ImageView view, String photoUrl) {
+        Glide.with(view.getContext())
+                .load(photoUrl).apply(new RequestOptions().circleCrop())
+                .into(view);
     }
 }

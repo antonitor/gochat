@@ -11,9 +11,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -30,10 +27,8 @@ import com.antonitor.gotchat.ui.chatroom.ChatActivity;
  */
 public class RoomsFragment extends Fragment implements RoomListAdapter.OnRoomClickListener{
 
-    private ViewModel viewModel;
     private FragmentTrendigListBinding mDataBinding;
     private RoomListAdapter recyclerViewAdapter;
-    private boolean roomSelected = false;
 
     public RoomsFragment() {
         // Required empty public constructor
@@ -53,7 +48,7 @@ public class RoomsFragment extends Fragment implements RoomListAdapter.OnRoomCli
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_trendig_list, container, false);
-        viewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
+        ViewModel viewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
 
         setUpRecyclerView();
 
@@ -72,26 +67,6 @@ public class RoomsFragment extends Fragment implements RoomListAdapter.OnRoomCli
         recyclerViewAdapter.startListening();
     }
 
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        if (roomSelected)
-            inflater.inflate(R.menu.room_action_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_delete_room:
-                return true;
-            case R.id.menu_follow_room:
-
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
     @Override
     public void onDestroyView() {

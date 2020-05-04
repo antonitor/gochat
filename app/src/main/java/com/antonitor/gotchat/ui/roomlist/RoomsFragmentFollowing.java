@@ -28,7 +28,6 @@ import java.util.Objects;
 
 public class RoomsFragmentFollowing extends Fragment implements  RoomListAdapterFollowing.OnRoomClickListener {
 
-    private ViewModel viewModel;
     private FragmentFollowingListBinding mDataBinding;
     private RoomListAdapterFollowing recyclerViewAdapter;
 
@@ -49,7 +48,7 @@ public class RoomsFragmentFollowing extends Fragment implements  RoomListAdapter
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_following_list, container, false);
-        viewModel = new ViewModelProvider(Objects.requireNonNull(getActivity())).get(MainViewModel.class);
+        ViewModel viewModel = new ViewModelProvider(Objects.requireNonNull(getActivity())).get(MainViewModel.class);
 
         setUpRecyclerView();
 
@@ -78,7 +77,7 @@ public class RoomsFragmentFollowing extends Fragment implements  RoomListAdapter
     @Override
     public void onRoomClicked(ChatRoom room) {
         Intent chatIntent = new Intent(getActivity(), ChatActivity.class);
-        chatIntent.putExtra(getString(R.string.key_chatroom), (Parcelable) room);
+        chatIntent.putExtra(getString(R.string.key_chatroom), room);
         getActivity().startActivity(chatIntent);
     }
 }

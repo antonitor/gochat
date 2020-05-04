@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -18,7 +19,7 @@ import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.ActivityChatRoomBinding;
 import com.antonitor.gotchat.model.Message;
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
-import com.antonitor.gotchat.sync.FirebaseAuthRepository;
+import com.antonitor.gotchat.sync.FirebaseAuthHelper;
 import com.vanniktech.emoji.EmojiPopup;
 
 
@@ -27,9 +28,9 @@ public class ChatActivity extends AppCompatActivity {
     private static final String TAG = "CHAT_ACTIVITY";
     private static final int RC_PHOTO_PICKER = 1985;
     private static final int RC_CAMERA_ACTION = 2020;
-    ActivityChatRoomBinding dataBinding;
-    ChatViewModel viewModel;
-    ChatAdapter adapter;
+    private ActivityChatRoomBinding dataBinding;
+    private ChatViewModel viewModel;
+    private ChatAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,12 +47,30 @@ public class ChatActivity extends AppCompatActivity {
         //Set up RecyclerView
         adapter = new ChatAdapter(FirebaseDatabaseRepository.getInstance()
                 .getMessageListOptions(viewModel.getChatRoom().getId()));
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         dataBinding.messageRecycleView.setAdapter(adapter);
         dataBinding.messageRecycleView.setLayoutManager(layoutManager);
+        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                int friendlyMessageCount = adapter.getItemCount();
+                int lastVisiblePosition =
+                        layoutManager.findLastCompletelyVisibleItemPosition();
+                // If the recycler view is initially being loaded or the
+                // user is at the bottom of the list, scroll to the bottom
+                // of the list to show the newly added message.
+                if (lastVisiblePosition == -1 ||
+                        (positionStart >= (friendlyMessageCount - 1) &&
+                                lastVisiblePosition == (positionStart - 1))) {
+                    dataBinding.messageRecycleView.scrollToPosition(positionStart);
+                }
+            }
+        });
 
-        //Handle user imput
+        //Handle user input
         dataBinding.sendButton.setOnClickListener(ChatActivity.this::takePhotoListener);
         dataBinding.photoPickerButton.setOnClickListener(ChatActivity.this::sendImageListener);
         dataBinding.messageEditText.addTextChangedListener(userInputWatcher());
@@ -96,7 +115,7 @@ public class ChatActivity extends AppCompatActivity {
                     Message tempMsg = new Message(
                             null,
                             viewModel.getChatRoom().getId(),
-                            FirebaseAuthRepository.getInstance().getFirebaseUser().getPhoneNumber(),
+                            FirebaseAuthHelper.getInstance().getFirebaseUser().getPhoneNumber(),
                             null,
                             localImage.toString(),
                             null);
@@ -140,12 +159,11 @@ public class ChatActivity extends AppCompatActivity {
                 .replaceFirst("\\s+$", "")
                 .replaceFirst("^\\s+", "");
         String roomId = viewModel.getChatRoom().getId();
-        String user = FirebaseAuthRepository.getInstance().getFirebaseUser()
+        String user = FirebaseAuthHelper.getInstance().getFirebaseUser()
                 .getPhoneNumber();
         Message message = new Message(null, roomId, user, text, null,null);
         dataBinding.messageEditText.setText("");
         FirebaseDatabaseRepository.getInstance().postMessage(message);
-        dataBinding.messageRecycleView.smoothScrollToPosition(adapter.getItemCount());
     }
 
     private void sendImageListener(View view) {

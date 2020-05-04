@@ -19,6 +19,7 @@ import com.antonitor.gotchat.databinding.FragmentOwnRoomsBinding;
 import com.antonitor.gotchat.model.ChatRoom;
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
 import com.antonitor.gotchat.ui.chatroom.ChatActivity;
+import com.antonitor.gotchat.ui.newroom.AddNewRoomActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,7 +28,6 @@ import com.antonitor.gotchat.ui.chatroom.ChatActivity;
  */
 public class RoomsFragmentOwn extends Fragment implements RoomListAdapterOwn.OnRoomClickListener {
 
-    private ViewModel viewModel;
     private FragmentOwnRoomsBinding mDataBinding;
     private RoomListAdapterOwn recyclerViewAdapter;
 
@@ -46,7 +46,7 @@ public class RoomsFragmentOwn extends Fragment implements RoomListAdapterOwn.OnR
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_own_rooms, container, false);
-        viewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
+        ViewModel viewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
         setUpAddFab();
         setUpRecyclerView();
 
@@ -80,7 +80,7 @@ public class RoomsFragmentOwn extends Fragment implements RoomListAdapterOwn.OnR
     @Override
     public void onRoomClicked(ChatRoom room) {
         Intent chatIntent = new Intent(getActivity(), ChatActivity.class);
-        chatIntent.putExtra(getString(R.string.key_chatroom), (Parcelable) room);
+        chatIntent.putExtra(getString(R.string.key_chatroom), room);
         getActivity().startActivity(chatIntent);
     }
 }

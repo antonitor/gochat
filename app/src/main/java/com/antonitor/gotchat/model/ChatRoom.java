@@ -34,7 +34,7 @@ public class ChatRoom implements Parcelable {
         this.owner = owner;
         this.timestamp = ServerValue.TIMESTAMP;
         this.imageUrl = imageUrl;
-        this.activeUsers = new HashMap<String, FirebaseUser>();
+        this.activeUsers = new HashMap<>();
     }
 
     public static final Creator<ChatRoom> CREATOR = new Creator<ChatRoom>() {

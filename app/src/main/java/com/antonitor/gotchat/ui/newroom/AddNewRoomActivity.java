@@ -1,4 +1,4 @@
-package com.antonitor.gotchat.ui.roomlist;
+package com.antonitor.gotchat.ui.newroom;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -61,6 +61,7 @@ public class AddNewRoomActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (data==null) return;
         switch (requestCode) {
             case RC_PHOTO_PICKER:
                 if (resultCode == RESULT_OK) {
@@ -74,6 +75,7 @@ public class AddNewRoomActivity extends AppCompatActivity {
             case RC_CAMERA_ACTION:
                 if (resultCode == RESULT_OK) {
                     Bundle extras = data.getExtras();
+                    if(data.getExtras()==null || !data.getExtras().containsKey("data")) return;
                     Bitmap imageBitmap = (Bitmap) extras.get("data");
                     viewModel.setBitmap(imageBitmap);
                     viewModel.setImageChosen();

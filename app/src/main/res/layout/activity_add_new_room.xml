@@ -6,7 +6,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.roomlist.AddNewRoomActivity">
+        tools:context=".ui.newroom.AddNewRoomActivity">
 
         <Button
             android:id="@+id/add_button"
@@ -27,7 +27,7 @@
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="4dp"
             android:layout_marginStart="8dp"
-            android:text="@string/cancell"
+            android:text="@string/cancel"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/add_button"
             app:layout_constraintStart_toStartOf="parent" />

@@ -1,4 +1,4 @@
-package com.antonitor.gotchat.ui.roomlist;
+package com.antonitor.gotchat.ui.newroom;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -14,14 +14,14 @@ import androidx.lifecycle.ViewModel;
 
 public class AddNewRoomViewModel extends ViewModel {
 
-    private static final String TAG = "ADD_NEW_ROOM_VIEWMODEL";
+    private static final String TAG = "ADD_NEW_ROOM_VIEW_MODEL";
 
     private boolean imageChosen;
     private Uri localImageUri;
     private Bitmap bitmap;
-    private MutableLiveData<String> imageUrl = new MutableLiveData<>();
-    private MutableLiveData<Double> uploadProgress = new MutableLiveData<>();
-    private MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
+    private final MutableLiveData<String> imageUrl = new MutableLiveData<>();
+    private final MutableLiveData<Double> uploadProgress = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
 
     void newChatRoom(String title, String topic, String url){
         FirebaseDatabaseRepository.getInstance().newChatRoom(title, title, topic, url);
@@ -34,7 +34,7 @@ public class AddNewRoomViewModel extends ViewModel {
                     .uploadBitmap(bitmap, FirebaseStorageRepository.getInstance()
                             .getRoomImageStorageReference());
             upTask.addOnSuccessListener(taskSnapshot -> {
-                Log.d(TAG, "SUCCESFULL BITMAP UPLOAD");
+                Log.d(TAG, "SUCCESSFUL BITMAP UPLOAD");
                 Log.d(TAG, "File: " + taskSnapshot.getMetadata().getName());
                 Log.d(TAG, "Path: " + taskSnapshot.getMetadata().getPath());
                 Log.d(TAG, "Size: " + taskSnapshot.getMetadata().getSizeBytes()/1000 + " kb");
@@ -56,7 +56,7 @@ public class AddNewRoomViewModel extends ViewModel {
         } else if (localImageUri!=null) {
             UploadTask upTask = FirebaseStorageRepository.getInstance().uploadFromLocal(localImageUri);
             upTask.addOnSuccessListener(taskSnapshot -> {
-                Log.d(TAG, "SUCCESFULL BITMAP UPLOAD");
+                Log.d(TAG, "SUCCESSFUL BITMAP UPLOAD");
                 Log.d(TAG, "File: " + taskSnapshot.getMetadata().getName());
                 Log.d(TAG, "Path: " + taskSnapshot.getMetadata().getPath());
                 Log.d(TAG, "Size: " + taskSnapshot.getMetadata().getSizeBytes()/1000 + " kb");

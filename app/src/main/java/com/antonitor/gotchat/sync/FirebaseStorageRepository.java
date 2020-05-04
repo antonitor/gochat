@@ -16,13 +16,12 @@ public class FirebaseStorageRepository {
     private static final Object LOCK = new Object();
 
     private static FirebaseStorageRepository sInstance;
-    private FirebaseStorage firebaseStorage;
-    private StorageReference roomImageStorageReference;
-    private StorageReference msgImageStorageReference;
+    private final StorageReference roomImageStorageReference;
+    private final StorageReference msgImageStorageReference;
 
 
     private FirebaseStorageRepository(){
-        firebaseStorage = FirebaseStorage.getInstance();
+        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
         roomImageStorageReference = firebaseStorage.getReference(FirebaseContract.ROOM_IMAGE_REF);
         msgImageStorageReference = firebaseStorage.getReference(FirebaseContract.MESSAGE_IMAGE_REF);
     }

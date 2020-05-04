@@ -13,28 +13,28 @@ import java.util.HashMap;
 
 import androidx.annotation.NonNull;
 
-public class FirebaseAuthRepository {
+public class FirebaseAuthHelper {
 
     private static final String LOG_TAG = FirebaseDatabaseRepository.class.getSimpleName();
-    private static FirebaseAuthRepository sInstance;
+    private static FirebaseAuthHelper sInstance;
     private static final Object LOCK = new Object();
 
     private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
     private User user;
 
-    public static FirebaseAuthRepository getInstance() {
+    public static FirebaseAuthHelper getInstance() {
         Log.d(LOG_TAG, "Getting Firebase Sync Repository");
         if (sInstance == null) {
             synchronized (LOCK) {
-                sInstance = new FirebaseAuthRepository();
+                sInstance = new FirebaseAuthHelper();
                 Log.d(LOG_TAG, "Made new new Firebase Sync Repository");
             }
         }
         return sInstance;
     }
 
-    private FirebaseAuthRepository() {
+    private FirebaseAuthHelper() {
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
         setUpUserChatRooms();

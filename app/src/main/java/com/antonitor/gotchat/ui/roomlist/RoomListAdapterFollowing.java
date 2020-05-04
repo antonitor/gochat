@@ -22,13 +22,12 @@ import androidx.appcompat.view.ActionMode;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class RoomListAdapterFollowing extends FirebaseRecyclerAdapter {
+class RoomListAdapterFollowing extends FirebaseRecyclerAdapter {
 
-    private OnRoomClickListener onRoomClickListener;
-    private ItemRoomBinding itemBinding;
+    private final OnRoomClickListener onRoomClickListener;
     private boolean multiSelect = false;
-    private ArrayList<ChatRoom> selectedItems = new ArrayList<ChatRoom>();
-    private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
+    private final ArrayList<ChatRoom> selectedItems = new ArrayList<>();
+    private final ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             multiSelect = true;
@@ -63,7 +62,7 @@ public class RoomListAdapterFollowing extends FirebaseRecyclerAdapter {
     }
 
 
-    public RoomListAdapterFollowing(@NonNull FirebaseRecyclerOptions options, OnRoomClickListener onRoomClickListener) {
+    RoomListAdapterFollowing(@NonNull FirebaseRecyclerOptions options, OnRoomClickListener onRoomClickListener) {
         super(options);
         this.onRoomClickListener = onRoomClickListener;
     }
@@ -90,21 +89,21 @@ public class RoomListAdapterFollowing extends FirebaseRecyclerAdapter {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        itemBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
+        ItemRoomBinding itemBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
                 R.layout.item_room, parent, false);
         return new RoomViewHolder(itemBinding);
     }
 
     class RoomViewHolder extends RecyclerView.ViewHolder {
 
-        ItemRoomBinding itemBinding;
+        final ItemRoomBinding itemBinding;
 
         RoomViewHolder(@NonNull ItemRoomBinding itemBinding) {
             super(itemBinding.getRoot());
             this.itemBinding = itemBinding;
         }
 
-        public void bind(ChatRoom room) {
+        void bind(ChatRoom room) {
             itemBinding.setChatroom(room);
             itemBinding.executePendingBindings();
         }

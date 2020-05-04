@@ -35,9 +35,9 @@ import androidx.recyclerview.widget.RecyclerView;
 public class ChatAdapter extends FirebaseRecyclerAdapter {
 
     private static final String TAG = "CHAT_ADAPTER";
-    private ArrayList<Message> selectedItems = new ArrayList<Message>();
+    private final ArrayList<Message> selectedItems = new ArrayList<>();
     private boolean multiSelect = false;
-    private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
+    private final ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             multiSelect = true;
@@ -78,13 +78,22 @@ public class ChatAdapter extends FirebaseRecyclerAdapter {
         MessageViewHolder viewHolder = (MessageViewHolder) holder;
         viewHolder.bind(message);
         if (message.getLocalPhotoUrl()!= null) {
-            Glide.with(viewHolder.dataBinding.photoImageView.getContext())
+            viewHolder.dataBinding.messageTv.setVisibility(View.GONE);
+            viewHolder.dataBinding.photoImageView.setVisibility(View.VISIBLE);
+            Log.d(TAG, "------------------ GLIDE LOADING LOCAL IMAGE " + holder.getAdapterPosition() +" -------------------");
+            Glide.with(viewHolder.itemView.getContext())
                     .load(message.getLocalPhotoUrl())
+                    .centerCrop()
                     .into(viewHolder.dataBinding.photoImageView);
             if (message.getPhotoUrl()== null) {
+                viewHolder.dataBinding.progressBarPictureUpload.setVisibility(View.VISIBLE);
                 viewHolder.uploadImage(message);
             }
-         }
+         } else {
+            Log.d(TAG, "----------- NO IMAGE MESSAGE " + holder.getAdapterPosition() +" -------------------");
+            viewHolder.dataBinding.photoImageView.setVisibility(View.GONE);
+            viewHolder.dataBinding.messageTv.setVisibility(View.VISIBLE);
+        }
 
         viewHolder.dataBinding.authorTv.setOnClickListener(view -> {
             if (multiSelect) {
@@ -96,6 +105,14 @@ public class ChatAdapter extends FirebaseRecyclerAdapter {
         });
         viewHolder.update(message);
 
+    }
+
+    @Override
+    public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
+        super.onViewRecycled(holder);
+        Log.d(TAG,"------------ RECYCLED HOLDER "+ holder.getAdapterPosition() + " -------------------");
+        Glide.with(holder.itemView.getContext())
+                .clear(((MessageViewHolder)holder).dataBinding.photoImageView);
     }
 
     @NonNull
@@ -110,7 +127,7 @@ public class ChatAdapter extends FirebaseRecyclerAdapter {
 
     class MessageViewHolder extends RecyclerView.ViewHolder {
 
-        MessageChatBinding dataBinding;
+        final MessageChatBinding dataBinding;
 
         MessageViewHolder(MessageChatBinding dataBinding) {
             super(dataBinding.getRoot());
@@ -174,12 +191,9 @@ public class ChatAdapter extends FirebaseRecyclerAdapter {
                 @Override
                 public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
                     Double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                    if (progress > 0 && progress < 10)
-                        dataBinding.progressBarPictureUpload.setVisibility(View.VISIBLE);
                     dataBinding.progressBarPictureUpload.setProgress(progress.intValue());
                 }
             });
         }
-
     }
 }

@@ -4,14 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -20,7 +17,7 @@ import android.widget.Toast;
 
 import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
-import com.antonitor.gotchat.sync.FirebaseAuthRepository;
+import com.antonitor.gotchat.sync.FirebaseAuthHelper;
 import com.antonitor.gotchat.utilities.Utilities;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
@@ -36,16 +33,15 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity  {
 
     private static final int RC_SIGN_IN = 1341;
-    public static final int PERMISSIONS_REQUEST = 123;
-    public static final String[] PERMISSIONS = {
+    private static final int PERMISSIONS_REQUEST = 123;
+    private static final String[] PERMISSIONS = {
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
     };
 
     private static final String TAG = MainActivity.class.getCanonicalName();
 
-    private FirebaseDatabaseRepository databaseRepository;
-    private FirebaseAuthRepository firebaseAuthRepository;
+    private FirebaseAuthHelper firebaseAuthHelper;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
     private MainViewModel mainViewModel;
@@ -61,8 +57,8 @@ public class MainActivity extends AppCompatActivity  {
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         //Initialize repositories
-        databaseRepository = FirebaseDatabaseRepository.getInstance();
-        firebaseAuthRepository = FirebaseAuthRepository.getInstance();
+        FirebaseDatabaseRepository databaseRepository = FirebaseDatabaseRepository.getInstance();
+        firebaseAuthHelper = FirebaseAuthHelper.getInstance();
 
         if (!Utilities.hasPermissions(this, PERMISSIONS)) {
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSIONS_REQUEST);
@@ -115,8 +111,8 @@ public class MainActivity extends AppCompatActivity  {
             IdpResponse response = IdpResponse.fromResultIntent(data);
 
             if (resultCode == RESULT_OK) {
-                firebaseAuthRepository.setFirebaseUser(FirebaseAuth.getInstance().getCurrentUser());
-                Log.d(TAG, "LOGGED AS " + firebaseAuthRepository.getFirebaseUser().getPhoneNumber());
+                firebaseAuthHelper.setFirebaseUser(FirebaseAuth.getInstance().getCurrentUser());
+                Log.d(TAG, "LOGGED AS " + firebaseAuthHelper.getFirebaseUser().getPhoneNumber());
             } else {
                 Log.e(TAG, "SIGN_IN FAILED");
                 finish();
@@ -127,13 +123,13 @@ public class MainActivity extends AppCompatActivity  {
 
 
     private void onSingedInInitialize(FirebaseUser user) {
-        firebaseAuthRepository.setFirebaseUser(user);
-        Log.d(TAG, "LOGGED AS " + firebaseAuthRepository.getFirebaseUser().getPhoneNumber());
+        firebaseAuthHelper.setFirebaseUser(user);
+        Log.d(TAG, "LOGGED AS " + firebaseAuthHelper.getFirebaseUser().getPhoneNumber());
         startFragmentPageAdapter();
     }
 
     private void onSingedOutCleanup() {
-        firebaseAuthRepository.setFirebaseUser(null);
+        firebaseAuthHelper.setFirebaseUser(null);
     }
 
     private void startFragmentPageAdapter() {
@@ -150,7 +146,7 @@ public class MainActivity extends AppCompatActivity  {
     protected void onResume() {
         super.onResume();
         //register AuthStateListener
-        FirebaseAuthRepository.getInstance().getFirebaseAuth().addAuthStateListener(mAuthStateListener);
+        FirebaseAuthHelper.getInstance().getFirebaseAuth().addAuthStateListener(mAuthStateListener);
     }
 
     @Override
@@ -158,7 +154,7 @@ public class MainActivity extends AppCompatActivity  {
         super.onPause();
         //Un-register AuthStateListener
         if (mAuthStateListener !=null)
-            FirebaseAuthRepository.getInstance().getFirebaseAuth().removeAuthStateListener(mAuthStateListener);
+            FirebaseAuthHelper.getInstance().getFirebaseAuth().removeAuthStateListener(mAuthStateListener);
     }
 
 }

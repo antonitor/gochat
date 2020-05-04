@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.image.ImageActivity">
+    <data>
+        <variable name="message" type="com.antonitor.gotchat.model.Message"/>
+        <variable name="image" type="String" />
+    </data>
+        <ImageView
+            android:id="@+id/image_fullsize"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/cd_showing_original_size_image"
+            app:messageImage="@{image}"/>
+</layout>
