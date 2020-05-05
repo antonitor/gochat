@@ -28,4 +28,5 @@
     <string name="cd_image_send_by_user">Image send by user</string>
     <string name="cd_showing_original_size_image">Showing original size image</string>
     <string name="share">Share</string>
+    <string name="profile">Profile</string>
 </resources>

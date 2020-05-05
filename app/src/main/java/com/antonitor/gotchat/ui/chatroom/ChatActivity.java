@@ -2,6 +2,7 @@ package com.antonitor.gotchat.ui.chatroom;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,6 +23,8 @@ import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
 import com.antonitor.gotchat.sync.FirebaseAuthHelper;
 import com.vanniktech.emoji.EmojiPopup;
 
+import java.util.List;
+
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -36,34 +39,41 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dataBinding = DataBindingUtil.setContentView(this, R.layout.activity_chat_room);
-        viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
-        viewModel.setChatRoom(getIntent().getExtras().getParcelable(getString(R.string.key_chatroom)));
-        setTitle(viewModel.getChatRoom().getTitle());
 
         EmojiPopup emojiPopup = EmojiPopup.Builder.fromRootView(dataBinding.getRoot())
                 .build(dataBinding.messageEditText);
         dataBinding.emojiPicker.setOnClickListener(view -> emojiPopup.toggle());
 
-        //Set up RecyclerView
-        adapter = new ChatAdapter(FirebaseDatabaseRepository.getInstance()
-                .getMessageListOptions(viewModel.getChatRoom().getId()));
+        viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
+        viewModel.setChatRoom(getIntent().getExtras().getParcelable(getString(R.string.key_chatroom)));
+        setTitle(viewModel.getChatRoom().getTitle());
+
+        adapter = new ChatAdapter(this);
+        dataBinding.messageRecycleView.setAdapter(adapter);
+        viewModel.getMessages().observe(this, new Observer<List<Message>>() {
+            @Override
+            public void onChanged(List<Message> messages) {
+                adapter.swapMessages(messages);
+                Log.d(TAG, "-------------------->>>>>>>> New messages: " + messages.size());
+            }
+        });
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
-        dataBinding.messageRecycleView.setAdapter(adapter);
         dataBinding.messageRecycleView.setLayoutManager(layoutManager);
+
         adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
                 super.onItemRangeInserted(positionStart, itemCount);
-                int friendlyMessageCount = adapter.getItemCount();
+                int messageCount = adapter.getItemCount();
                 int lastVisiblePosition =
                         layoutManager.findLastCompletelyVisibleItemPosition();
                 // If the recycler view is initially being loaded or the
                 // user is at the bottom of the list, scroll to the bottom
                 // of the list to show the newly added message.
                 if (lastVisiblePosition == -1 ||
-                        (positionStart >= (friendlyMessageCount - 1) &&
+                        (positionStart >= (messageCount - 1) &&
                                 lastVisiblePosition == (positionStart - 1))) {
                     dataBinding.messageRecycleView.scrollToPosition(positionStart);
                 }
@@ -139,18 +149,6 @@ public class ChatActivity extends AppCompatActivity {
 
                  */
         }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        adapter.startListening();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        adapter.stopListening();
     }
 
     private void sendTextListener(View view) {

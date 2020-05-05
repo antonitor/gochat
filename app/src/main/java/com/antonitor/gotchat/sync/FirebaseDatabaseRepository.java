@@ -12,6 +12,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import androidx.annotation.NonNull;
 
 public class FirebaseDatabaseRepository {
@@ -24,6 +27,13 @@ public class FirebaseDatabaseRepository {
     private final DatabaseReference chatroomsReference;
     private final DatabaseReference userChatsReference;
     private final DatabaseReference messageReference;
+    private FirebaseDatabaseRepositoryCallback<Message> messagesCallback;
+    private ValueEventListener messagesListener;
+
+    public interface FirebaseDatabaseRepositoryCallback<T> {
+        void onSuccess(List<T> result);
+        void onError(Exception e);
+    }
 
     private FirebaseDatabaseRepository(){
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -41,6 +51,32 @@ public class FirebaseDatabaseRepository {
             }
         }
         return sInstance;
+    }
+
+
+    public void addMessagesListener(String roomID, FirebaseDatabaseRepositoryCallback<Message> callback) {
+        this.messagesCallback = callback;
+        messagesListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<Message> messageList = new ArrayList<>();
+                for (DataSnapshot item : dataSnapshot.getChildren()) {
+                    messageList.add(item.getValue(Message.class));
+                }
+                messagesCallback.onSuccess(messageList);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                messagesCallback.onError(new Exception(databaseError.getMessage()));
+            }
+        };
+        messageReference.child(roomID).addValueEventListener(messagesListener);
+    }
+
+    public void removeMessageListener() {
+        if (messageReference!=null)
+            messageReference.removeEventListener(messagesListener);
     }
 
     /**
@@ -150,13 +186,6 @@ public class FirebaseDatabaseRepository {
                 .build();
     }
 
-
-
-    public FirebaseRecyclerOptions<Message> getMessageListOptions(String roomID){
-        return new FirebaseRecyclerOptions.Builder<Message>()
-                .setQuery(getMessageListQuery(roomID), Message.class)
-                .build();
-    }
 
     public DatabaseReference getUserChatsReference() {
         return userChatsReference;
