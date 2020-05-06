@@ -20,7 +20,7 @@ import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.ActivityChatRoomBinding;
 import com.antonitor.gotchat.model.Message;
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
-import com.antonitor.gotchat.sync.FirebaseAuthHelper;
+import com.antonitor.gotchat.sync.FirebaseAuthRepository;
 import com.vanniktech.emoji.EmojiPopup;
 
 import java.util.List;
@@ -125,7 +125,7 @@ public class ChatActivity extends AppCompatActivity {
                     Message tempMsg = new Message(
                             null,
                             viewModel.getChatRoom().getId(),
-                            FirebaseAuthHelper.getInstance().getFirebaseUser().getPhoneNumber(),
+                            FirebaseAuthRepository.getInstance().getFirebaseUser().getPhoneNumber(),
                             null,
                             localImage.toString(),
                             null);
@@ -157,7 +157,7 @@ public class ChatActivity extends AppCompatActivity {
                 .replaceFirst("\\s+$", "")
                 .replaceFirst("^\\s+", "");
         String roomId = viewModel.getChatRoom().getId();
-        String user = FirebaseAuthHelper.getInstance().getFirebaseUser()
+        String user = FirebaseAuthRepository.getInstance().getFirebaseUser()
                 .getPhoneNumber();
         Message message = new Message(null, roomId, user, text, null,null);
         dataBinding.messageEditText.setText("");

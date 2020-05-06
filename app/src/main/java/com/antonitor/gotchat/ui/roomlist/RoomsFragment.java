@@ -3,10 +3,8 @@ package com.antonitor.gotchat.ui.roomlist;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -29,6 +27,7 @@ public class RoomsFragment extends Fragment implements RoomListAdapter.OnRoomCli
 
     private FragmentTrendigListBinding mDataBinding;
     private RoomListAdapter recyclerViewAdapter;
+    private MainViewModel viewModel;
 
     public RoomsFragment() {
         // Required empty public constructor
@@ -48,7 +47,7 @@ public class RoomsFragment extends Fragment implements RoomListAdapter.OnRoomCli
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_trendig_list, container, false);
-        ViewModel viewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
+        viewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
 
         setUpRecyclerView();
 
@@ -58,7 +57,8 @@ public class RoomsFragment extends Fragment implements RoomListAdapter.OnRoomCli
     private void setUpRecyclerView(){
         recyclerViewAdapter = new RoomListAdapter(
                 FirebaseDatabaseRepository.getInstance().getTrendingChatRoomListOptions(),
-                this);
+                this,
+                viewModel.getCustomUser());
         mDataBinding.trendingRecyclerview.setAdapter(recyclerViewAdapter);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         //manager.setReverseLayout(true);

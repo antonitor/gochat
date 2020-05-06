@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.antonitor.gotchat.model.ChatRoom;
 import com.antonitor.gotchat.model.Message;
+import com.antonitor.gotchat.model.User;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -86,15 +87,15 @@ public class FirebaseDatabaseRepository {
      * @param topic room topic
      * @param photoUrl room photourl
      */
-    public void newChatRoom(String roomID, String title, String topic, String photoUrl){
+    public void newChatRoom(String roomID, String title, String topic, String photoUrl, User owner){
         ChatRoom room = new ChatRoom(
                 roomID,
                 title,
                 topic,
-                FirebaseAuthHelper.getInstance().getFirebaseUser().getUid(),
+                FirebaseAuthRepository.getInstance().getFirebaseUser().getUid(),
                 photoUrl);
         chatroomsReference.child(roomID).setValue(room);
-        addOwnChatRoom(room);
+        addOwnChatRoom(room, owner);
     }
 
     /**
@@ -102,29 +103,29 @@ public class FirebaseDatabaseRepository {
      * Stored as /userchats/userID/ownChatRooms/roomID
      * @param room object stored
      */
-    private void addOwnChatRoom(ChatRoom room) {
-        String userUid = FirebaseAuthHelper.getInstance().getFirebaseUser().getUid();
-        FirebaseAuthHelper.getInstance().getUser().getOwnChatRooms().put(room.getId(), room);
-        userChatsReference.child(userUid).child(FirebaseContract.OWN_ROOMS_REF).setValue(FirebaseAuthHelper.getInstance().getUser().getOwnChatRooms());
+    private void addOwnChatRoom(ChatRoom room, User user) {
+        String userUid = FirebaseAuthRepository.getInstance().getFirebaseUser().getUid();
+        user.getOwnChatRooms().put(room.getId(), room);
+        userChatsReference.child(userUid).child(FirebaseContract.OWN_ROOMS_REF).setValue(user.getOwnChatRooms());
     }
 
-    public void addFollowingChat(ChatRoom room) {
-        String userUid = FirebaseAuthHelper.getInstance().getFirebaseUser().getUid();
-        FirebaseAuthHelper.getInstance().getUser().getFollowedChatRooms().put(room.getId(), room);
-        userChatsReference.child(userUid).child(FirebaseContract.FOLLOWED_ROOMS_REF).setValue(FirebaseAuthHelper.getInstance().getUser().getFollowedChatRooms());
+    public void addFollowingChat(ChatRoom room, User user) {
+        String userUid = FirebaseAuthRepository.getInstance().getFirebaseUser().getUid();
+        user.getFollowedChatRooms().put(room.getId(), room);
+        userChatsReference.child(userUid).child(FirebaseContract.FOLLOWED_ROOMS_REF).setValue(user.getFollowedChatRooms());
     }
 
-    public void unFollowChat(ChatRoom room) {
-        String userUid = FirebaseAuthHelper.getInstance().getFirebaseUser().getUid();
-        FirebaseAuthHelper.getInstance().getUser().getFollowedChatRooms().remove(room.getId());
+    public void unFollowChat(ChatRoom room, User user) {
+        String userUid = FirebaseAuthRepository.getInstance().getFirebaseUser().getUid();
+        user.getFollowedChatRooms().remove(room.getId());
         userChatsReference.child(userUid).child(FirebaseContract.FOLLOWED_ROOMS_REF).child(room.getId()).removeValue();
     }
 
-    public void removeChatRoom(String roomID) {
-        String userUid = FirebaseAuthHelper.getInstance().getFirebaseUser().getUid();
+    public void removeChatRoom(String roomID, User user) {
+        String userUid = FirebaseAuthRepository.getInstance().getFirebaseUser().getUid();
         chatroomsReference.child(roomID).removeValue((databaseError, databaseReference) -> {
-            FirebaseAuthHelper.getInstance().getUser().getOwnChatRooms().remove(roomID);
-            FirebaseAuthHelper.getInstance().getUser().getFollowedChatRooms().remove(roomID);
+            user.getOwnChatRooms().remove(roomID);
+            user.getFollowedChatRooms().remove(roomID);
             userChatsReference.child(userUid).child(FirebaseContract.OWN_ROOMS_REF).child(roomID).removeValue();
             userChatsReference.child(userUid).child(FirebaseContract.FOLLOWED_ROOMS_REF).child(roomID).removeValue();
             messageReference.child(roomID).removeValue();
@@ -157,15 +158,11 @@ public class FirebaseDatabaseRepository {
     }
 
     private Query getFollowingRoomsQuery(){
-        return userChatsReference.child(FirebaseAuthHelper.getInstance().getFirebaseUser().getUid()).child(FirebaseContract.FOLLOWED_ROOMS_REF);
+        return userChatsReference.child(FirebaseAuthRepository.getInstance().getFirebaseUser().getUid()).child(FirebaseContract.FOLLOWED_ROOMS_REF);
     }
 
     private Query getOwnChatRoomsQuery(){
-        return userChatsReference.child(FirebaseAuthHelper.getInstance().getFirebaseUser().getUid()).child(FirebaseContract.OWN_ROOMS_REF);
-    }
-
-    private Query getMessageListQuery(String roomId){
-        return messageReference.child(roomId);
+        return userChatsReference.child(FirebaseAuthRepository.getInstance().getFirebaseUser().getUid()).child(FirebaseContract.OWN_ROOMS_REF);
     }
 
     public FirebaseRecyclerOptions<ChatRoom> getTrendingChatRoomListOptions(){

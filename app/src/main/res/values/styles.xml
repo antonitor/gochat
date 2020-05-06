@@ -8,7 +8,10 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorButtonNormal">@drawable/button_selector</item>
         <item name="android:buttonStyle">@style/ButtonStyle</item>
+        <item name="android:textColorPrimary">@color/white</item>
     </style>
+
+
 
     <style name="ActionModeTheme" parent="AppTheme">
         <item name="actionModeStyle">@style/GoChatActionModeStyle</item>

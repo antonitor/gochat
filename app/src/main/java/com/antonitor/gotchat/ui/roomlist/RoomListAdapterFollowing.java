@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.ItemRoomBinding;
 import com.antonitor.gotchat.model.ChatRoom;
+import com.antonitor.gotchat.model.User;
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -24,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 class RoomListAdapterFollowing extends FirebaseRecyclerAdapter {
 
+    private User owner;
     private final OnRoomClickListener onRoomClickListener;
     private boolean multiSelect = false;
     private final ArrayList<ChatRoom> selectedItems = new ArrayList<>();
@@ -43,7 +45,7 @@ class RoomListAdapterFollowing extends FirebaseRecyclerAdapter {
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             for (ChatRoom room : selectedItems) {
-                FirebaseDatabaseRepository.getInstance().unFollowChat(room);
+                FirebaseDatabaseRepository.getInstance().unFollowChat(room, owner);
             }
             mode.finish();
             return true;
@@ -62,9 +64,10 @@ class RoomListAdapterFollowing extends FirebaseRecyclerAdapter {
     }
 
 
-    RoomListAdapterFollowing(@NonNull FirebaseRecyclerOptions options, OnRoomClickListener onRoomClickListener) {
+    RoomListAdapterFollowing(@NonNull FirebaseRecyclerOptions options, OnRoomClickListener onRoomClickListener, User owner) {
         super(options);
         this.onRoomClickListener = onRoomClickListener;
+        this.owner = owner;
     }
 
     @Override

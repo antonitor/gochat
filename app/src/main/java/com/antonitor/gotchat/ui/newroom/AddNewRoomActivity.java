@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.ActivityAddNewRoomBinding;
+import com.antonitor.gotchat.model.User;
 import com.bumptech.glide.Glide;
 
 import static com.antonitor.gotchat.utilities.Utilities.bitmapByteArray;
@@ -33,6 +34,8 @@ public class AddNewRoomActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         dataBinding = DataBindingUtil.setContentView(this, R.layout.activity_add_new_room);
         viewModel = new ViewModelProvider(this).get(AddNewRoomViewModel.class);
+        User user = getIntent().getExtras().getParcelable(getString(R.string.extra_userowner));
+        viewModel.setOwner(user);
 
         dataBinding.takePictureButton.setOnClickListener(this::takePictureOnClickListener);
         dataBinding.addPictureButton.setOnClickListener(this::addPictureOnClickListener);
@@ -94,7 +97,7 @@ public class AddNewRoomActivity extends AppCompatActivity {
             final String topic = dataBinding.newTextEt.getText().toString();
             if (viewModel.isImageChosen()) {
                 Observer<String> imageUrlObserver = imageURl -> {
-                    viewModel.newChatRoom(title, topic, imageURl);
+                    viewModel.newChatRoom(title, topic, imageURl, viewModel.getOwner());
                     finish();
                 };
                 viewModel.getImageUrl().observe(this, imageUrlObserver);

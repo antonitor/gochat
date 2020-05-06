@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Log;
 
+import com.antonitor.gotchat.model.User;
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
 import com.antonitor.gotchat.sync.FirebaseStorageRepository;
 import com.google.android.gms.tasks.Task;
@@ -19,13 +20,13 @@ public class AddNewRoomViewModel extends ViewModel {
     private boolean imageChosen;
     private Uri localImageUri;
     private Bitmap bitmap;
+    private User owner;
     private final MutableLiveData<String> imageUrl = new MutableLiveData<>();
     private final MutableLiveData<Double> uploadProgress = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
 
-    void newChatRoom(String title, String topic, String url){
-        FirebaseDatabaseRepository.getInstance().newChatRoom(title, title, topic, url);
-
+    void newChatRoom(String title, String topic, String url, User owner){
+        FirebaseDatabaseRepository.getInstance().newChatRoom(title, title, topic, url, owner);
     }
 
     void uploadImage() {
@@ -115,5 +116,13 @@ public class AddNewRoomViewModel extends ViewModel {
 
     void setLocalImageUri(Uri localImageUri) {
         this.localImageUri = localImageUri;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User user) {
+        this.owner = user;
     }
 }

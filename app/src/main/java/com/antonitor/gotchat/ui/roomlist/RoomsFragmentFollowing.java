@@ -30,6 +30,7 @@ public class RoomsFragmentFollowing extends Fragment implements  RoomListAdapter
 
     private FragmentFollowingListBinding mDataBinding;
     private RoomListAdapterFollowing recyclerViewAdapter;
+    private MainViewModel viewModel;
 
     public RoomsFragmentFollowing() {
         // Required empty public constructor
@@ -48,7 +49,7 @@ public class RoomsFragmentFollowing extends Fragment implements  RoomListAdapter
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_following_list, container, false);
-        ViewModel viewModel = new ViewModelProvider(Objects.requireNonNull(getActivity())).get(MainViewModel.class);
+        viewModel = new ViewModelProvider(Objects.requireNonNull(getActivity())).get(MainViewModel.class);
 
         setUpRecyclerView();
 
@@ -58,7 +59,8 @@ public class RoomsFragmentFollowing extends Fragment implements  RoomListAdapter
     private void setUpRecyclerView(){
         recyclerViewAdapter = new RoomListAdapterFollowing(
                 FirebaseDatabaseRepository.getInstance().getFollowedChatRoomListOptions(),
-                this);
+                this,
+                viewModel.getCustomUser());
         mDataBinding.followingRecyclerview.setAdapter(recyclerViewAdapter);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         mDataBinding.followingRecyclerview.setLayoutManager(manager);

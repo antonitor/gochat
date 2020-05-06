@@ -5,11 +5,9 @@ import android.os.Bundle;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +28,7 @@ public class RoomsFragmentOwn extends Fragment implements RoomListAdapterOwn.OnR
 
     private FragmentOwnRoomsBinding mDataBinding;
     private RoomListAdapterOwn recyclerViewAdapter;
+    private MainViewModel viewModel;
 
     public RoomsFragmentOwn() {}
 
@@ -46,7 +45,7 @@ public class RoomsFragmentOwn extends Fragment implements RoomListAdapterOwn.OnR
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_own_rooms, container, false);
-        ViewModel viewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
+        viewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
         setUpAddFab();
         setUpRecyclerView();
 
@@ -56,13 +55,16 @@ public class RoomsFragmentOwn extends Fragment implements RoomListAdapterOwn.OnR
     private void setUpAddFab(){
         mDataBinding.addFab.setOnClickListener(view -> {
             Intent newChatRoomIntent = new Intent(getActivity(), AddNewRoomActivity.class);
+            newChatRoomIntent.putExtra(getString(R.string.extra_userowner), viewModel.getCustomUser());
             getActivity().startActivity(newChatRoomIntent);
         });
     }
 
     private void setUpRecyclerView(){
         recyclerViewAdapter = new RoomListAdapterOwn(
-                FirebaseDatabaseRepository.getInstance().getOwnChatRoomListOptions(), this);
+                FirebaseDatabaseRepository.getInstance().getOwnChatRoomListOptions(),
+                this,
+                viewModel.getCustomUser());
         mDataBinding.ownRecyclerview.setAdapter(recyclerViewAdapter);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         mDataBinding.ownRecyclerview.setLayoutManager(manager);

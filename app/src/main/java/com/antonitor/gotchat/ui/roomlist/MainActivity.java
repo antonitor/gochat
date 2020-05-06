@@ -1,7 +1,6 @@
 package com.antonitor.gotchat.ui.roomlist;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -9,21 +8,18 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
 
 import com.antonitor.gotchat.R;
-import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
-import com.antonitor.gotchat.sync.FirebaseAuthHelper;
 import com.antonitor.gotchat.utilities.Utilities;
 import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.tabs.TabLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.google.GoogleEmojiProvider;
 
@@ -32,105 +28,80 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity  {
 
-    private static final int RC_SIGN_IN = 1341;
-    private static final int PERMISSIONS_REQUEST = 123;
-    private static final String[] PERMISSIONS = {
+    private static final int PERMISSIONS_REQ = 123;
+    private static final String[] STORAGE_PERMISSIONS = {
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
     };
-
-    private static final String TAG = MainActivity.class.getCanonicalName();
-
-    private FirebaseAuthHelper firebaseAuthHelper;
-    private FirebaseAuth.AuthStateListener mAuthStateListener;
-
     private MainViewModel mainViewModel;
+    private static final String LOG_TAG = "MAIN_ACTIVITY";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         EmojiManager.install(new GoogleEmojiProvider());
-        setAuthListener();
-        //add viwemodel
+
+        //Setup ViewModel
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        mainViewModel.getLogin().observe(this, login -> {
+            if (login) {
+                Log.d(LOG_TAG, "---------------- REQUEST PERMISSIONS ------------");
+                requestPermissions();
+            } else {
+                Log.d(LOG_TAG, "---------------- START LOGIN SCREEN --------------");
+                startLoginScreen();
+            }
+        });
+        mainViewModel.startAuthenticationListener();
+    }
 
-        //Initialize repositories
-        FirebaseDatabaseRepository databaseRepository = FirebaseDatabaseRepository.getInstance();
-        firebaseAuthHelper = FirebaseAuthHelper.getInstance();
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return true;
+    }
 
-        if (!Utilities.hasPermissions(this, PERMISSIONS)) {
-            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSIONS_REQUEST);
+
+
+    public void requestPermissions(){
+        if (Utilities.hasPermissions(this, STORAGE_PERMISSIONS)) {
+            startFragmentPageAdapter();
+        } else {
+            ActivityCompat.requestPermissions(this, STORAGE_PERMISSIONS, PERMISSIONS_REQ);
         }
     }
+
+    private void startLoginScreen() {
+        List<AuthUI.IdpConfig> providers =
+                Arrays.asList(new AuthUI.IdpConfig.PhoneBuilder().build());
+
+        startActivity(AuthUI.getInstance()
+                .createSignInIntentBuilder()
+                .setLogo(R.mipmap.ic_launcher)
+                .setTheme(R.style.AppTheme)
+                .setAvailableProviders(providers)
+                .build());
+    }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         switch (requestCode) {
-            case PERMISSIONS_REQUEST:
+            case PERMISSIONS_REQ:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
+                    Log.d(LOG_TAG, "---------------- SHOWING FRAGMENT ------------");
+                    startFragmentPageAdapter();
                 } else {
-                    // Permission Denied
-                    Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
+                    Log.d(LOG_TAG, "---------------- REQUEST PERMISSIONS AGAIN!!!----------");
+                    requestPermissions();
                 }
-
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private void setAuthListener() {
-        mAuthStateListener = firebaseAuth -> {
-            FirebaseUser user = firebaseAuth.getCurrentUser();
-            if (user != null) {
-                onSingedInInitialize(user);
-            } else {
-                onSingedOutCleanup();
-                List<AuthUI.IdpConfig> providers =
-                        Arrays.asList(new AuthUI.IdpConfig.PhoneBuilder().build());
-
-                startActivityForResult(AuthUI.getInstance()
-                                .createSignInIntentBuilder()
-                                .setLogo(R.mipmap.ic_launcher)
-                                .setTheme(R.style.AppTheme)
-                                .setAvailableProviders(providers)
-                                .build()
-                        , RC_SIGN_IN);
-            }
-        };
-
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == RC_SIGN_IN) {
-            IdpResponse response = IdpResponse.fromResultIntent(data);
-
-            if (resultCode == RESULT_OK) {
-                firebaseAuthHelper.setFirebaseUser(FirebaseAuth.getInstance().getCurrentUser());
-                Log.d(TAG, "LOGGED AS " + firebaseAuthHelper.getFirebaseUser().getPhoneNumber());
-            } else {
-                Log.e(TAG, "SIGN_IN FAILED");
-                finish();
-            }
-        }
-    }
-
-
-
-    private void onSingedInInitialize(FirebaseUser user) {
-        firebaseAuthHelper.setFirebaseUser(user);
-        Log.d(TAG, "LOGGED AS " + firebaseAuthHelper.getFirebaseUser().getPhoneNumber());
-        startFragmentPageAdapter();
-    }
-
-    private void onSingedOutCleanup() {
-        firebaseAuthHelper.setFirebaseUser(null);
-    }
 
     private void startFragmentPageAdapter() {
         ViewPager viewPager = findViewById(R.id.pager);
@@ -141,21 +112,11 @@ public class MainActivity extends AppCompatActivity  {
         viewPager.setAdapter(pagerAdapter);
     }
 
-
     @Override
-    protected void onResume() {
-        super.onResume();
-        //register AuthStateListener
-        FirebaseAuthHelper.getInstance().getFirebaseAuth().addAuthStateListener(mAuthStateListener);
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.menu_singout)
+            mainViewModel.singOut();
+        return super.onOptionsItemSelected(item);
     }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        //Un-register AuthStateListener
-        if (mAuthStateListener !=null)
-            FirebaseAuthHelper.getInstance().getFirebaseAuth().removeAuthStateListener(mAuthStateListener);
-    }
-
 }
 
