@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -65,6 +66,12 @@ public class RoomsFragmentFollowing extends Fragment implements  RoomListAdapter
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         mDataBinding.followingRecyclerview.setLayoutManager(manager);
         recyclerViewAdapter.startListening();
+        viewModel.getLogin().observe(getActivity(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean login) {
+                if (!login) recyclerViewAdapter.stopListening();
+            }
+        });
     }
 
 
