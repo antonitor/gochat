@@ -1,5 +1,7 @@
 package com.antonitor.gotchat.ui.chatroom;
 
+import android.util.Log;
+
 import com.antonitor.gotchat.model.ChatRoom;
 import com.antonitor.gotchat.model.Message;
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
@@ -12,7 +14,7 @@ import androidx.lifecycle.ViewModel;
 
 public class ChatViewModel extends ViewModel {
 
-    private static final String TAG = "CHAT_VIEW_MODEL";
+    private static final String LOG_TAG = "CHAT_VIEW_MODEL";
 
     private ChatRoom chatRoom;
     private MutableLiveData<List<Message>> messages;
@@ -44,6 +46,7 @@ public class ChatViewModel extends ViewModel {
     @Override
     protected void onCleared() {
         repository.removeMessageListener();
+        Log.d(LOG_TAG, "-------- CHAT VIEWMODEL CLEARED --- STOP LISTENING MESSAGES -------");
     }
 
     ChatRoom getChatRoom() {

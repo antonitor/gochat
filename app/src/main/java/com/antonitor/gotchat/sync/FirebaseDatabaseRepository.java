@@ -30,6 +30,8 @@ public class FirebaseDatabaseRepository {
     private final DatabaseReference messageReference;
     private FirebaseDatabaseRepositoryCallback<Message> messagesCallback;
     private ValueEventListener messagesListener;
+    private FirebaseDatabaseRepositoryCallback<ChatRoom> roomsCallback;
+    private ValueEventListener roomsListener;
 
     public interface FirebaseDatabaseRepositoryCallback<T> {
         void onSuccess(List<T> result);
@@ -79,6 +81,33 @@ public class FirebaseDatabaseRepository {
         if (messageReference!=null)
             messageReference.removeEventListener(messagesListener);
     }
+
+
+    public void addRoomsListener(FirebaseDatabaseRepositoryCallback<ChatRoom> callback) {
+        this.roomsCallback = callback;
+        roomsListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<ChatRoom> roomsList = new ArrayList<>();
+                for (DataSnapshot item : dataSnapshot.getChildren()) {
+                    roomsList.add(item.getValue(ChatRoom.class));
+                }
+                roomsCallback.onSuccess(roomsList);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                roomsCallback.onError(new Exception(databaseError.getMessage()));
+            }
+        };
+        chatroomsReference.addValueEventListener(roomsListener);
+    }
+
+    public void removeRoomsListener() {
+        if (roomsListener!=null)
+            chatroomsReference.removeEventListener(roomsListener);
+    }
+
 
     /**
      * Add new Chat Room stored as /chatrooms/roomID

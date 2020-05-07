@@ -1,5 +1,6 @@
 package com.antonitor.gotchat.ui.roomlist;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,28 +13,31 @@ import com.antonitor.gotchat.databinding.ItemRoomBinding;
 import com.antonitor.gotchat.model.ChatRoom;
 import com.antonitor.gotchat.model.User;
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-class RoomListAdapter extends FirebaseRecyclerAdapter {
+class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.RoomViewHolder> {
 
+    private Context mContext;
     private User owner;
+    private List<ChatRoom> chatRooms = new ArrayList<>();
     private final OnRoomClickListener onRoomClickListener;
-    private boolean multiSelect = false;
+
     private final ArrayList<ChatRoom> selectedItems = new ArrayList<>();
+    private boolean multiSelect = false;
     private final ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             multiSelect = true;
-            menu.add("Subscribe");
+            menu.add("SUBSCRIBE");
             return true;
         }
 
@@ -64,37 +68,64 @@ class RoomListAdapter extends FirebaseRecyclerAdapter {
     }
 
 
-    RoomListAdapter(@NonNull FirebaseRecyclerOptions options, OnRoomClickListener onRoomClickListener, User owner) {
-        super(options);
+    RoomListAdapter(Context context, OnRoomClickListener onRoomClickListener, User owner) {
+        this.mContext = context;
         this.onRoomClickListener = onRoomClickListener;
         this.owner = owner;
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder,
-                                    int position, @NonNull Object model) {
-        ChatRoom room = (ChatRoom) model;
-        RoomViewHolder roomViewHolder = (RoomViewHolder) holder;
-        roomViewHolder.bind(room);
-        roomViewHolder.itemBinding.setImage(room.getImageUrl());
-        roomViewHolder.itemBinding.getRoot().setOnClickListener(view -> {
-                    if (multiSelect) {
-                        //uncomment to enable multiple selection
-                        //roomViewHolder.selectItem(room.getId());
-                    } else {
-                        onRoomClickListener.onRoomClicked(room);
-                    }
-                });
-        roomViewHolder.update(room);
+    public RoomViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        ItemRoomBinding itemBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
+                R.layout.item_room, parent, false);
+        return new RoomViewHolder(itemBinding);
     }
 
 
-    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        com.antonitor.gotchat.databinding.ItemRoomBinding itemBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
-                R.layout.item_room, parent, false);
-        return new RoomViewHolder(itemBinding);
+    public void onBindViewHolder(@NonNull RoomViewHolder holder, int position) {
+        holder.bind(chatRooms.get(position));
+    }
+
+
+    @Override
+    public int getItemCount() {
+        if (chatRooms == null) return 0;
+        return chatRooms.size();
+    }
+
+    void swapChatRooms(final List<ChatRoom> newList) {
+        if (chatRooms == null) {
+            chatRooms = newList;
+            notifyDataSetChanged();
+        } else {
+            DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+                @Override
+                public int getOldListSize() {
+                    return chatRooms.size();
+                }
+
+                @Override
+                public int getNewListSize() {
+                    return newList.size();
+                }
+
+                @Override
+                public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                    return chatRooms.get(oldItemPosition).getId() ==
+                            newList.get(newItemPosition).getId();
+                }
+                @Override
+                public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                    ChatRoom newChatRoom = newList.get(newItemPosition);
+                    ChatRoom oldChatRoom = chatRooms.get(oldItemPosition);
+                    return newChatRoom.getId() == oldChatRoom.getId()
+                            && newChatRoom.getTimestamp().equals(oldChatRoom.getTimestamp());
+                }
+            });
+            chatRooms = newList;
+            result.dispatchUpdatesTo(this);
+        }
     }
 
     class RoomViewHolder extends RecyclerView.ViewHolder {
@@ -109,6 +140,16 @@ class RoomListAdapter extends FirebaseRecyclerAdapter {
         void bind(ChatRoom room) {
             itemBinding.setChatroom(room);
             itemBinding.executePendingBindings();
+            itemBinding.setImage(room.getImageUrl());
+            itemBinding.getRoot().setOnClickListener(view -> {
+                if (multiSelect) {
+                    //uncomment to enable multiple selection
+                    //roomViewHolder.selectItem(room.getId());
+                } else {
+                    onRoomClickListener.onRoomClicked(room);
+                }
+            });
+            update(room);
         }
 
         void selectItem(ChatRoom room) {
@@ -129,13 +170,10 @@ class RoomListAdapter extends FirebaseRecyclerAdapter {
             } else {
                 itemView.setBackgroundColor(Color.WHITE);
             }
-            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    ((AppCompatActivity)view.getContext()).startSupportActionMode(actionModeCallbacks);
-                    selectItem(room);
-                    return true;
-                }
+            itemView.setOnLongClickListener(view -> {
+                ((AppCompatActivity)view.getContext()).startSupportActionMode(actionModeCallbacks);
+                selectItem(room);
+                return true;
             });
         }
     }

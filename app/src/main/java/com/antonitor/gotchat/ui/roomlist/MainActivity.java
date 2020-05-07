@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
@@ -14,7 +15,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.utilities.Utilities;
@@ -28,13 +28,28 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity  {
 
+    private static final String LOG_TAG = "MAIN_ACTIVITY";
     private static final int PERMISSIONS_REQ = 123;
     private static final String[] STORAGE_PERMISSIONS = {
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
     };
     private MainViewModel mainViewModel;
-    private static final String LOG_TAG = "MAIN_ACTIVITY";
+    private Observer<Boolean> loginObserver = new Observer<Boolean>() {
+        @Override
+        public void onChanged(Boolean login) {
+            if (login) {
+                Log.d(LOG_TAG, "----------- OBSERVING LOGIN: CHANGED TRUE -------");
+                Log.d(LOG_TAG, "---------------- REQUEST PERMISSIONS ------------");
+                requestPermissions();
+            } else {
+                Log.d(LOG_TAG, "----------- OBSERVING LOGIN: CHANGED FALSE -------");
+                Log.d(LOG_TAG, "---------------- START LOGIN SCREEN --------------");
+                startLoginScreen();
+            }
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,16 +59,9 @@ public class MainActivity extends AppCompatActivity  {
 
         //Setup ViewModel
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
-        mainViewModel.getLogin().observe(this, login -> {
-            if (login) {
-                Log.d(LOG_TAG, "---------------- REQUEST PERMISSIONS ------------");
-                requestPermissions();
-            } else {
-                Log.d(LOG_TAG, "---------------- START LOGIN SCREEN --------------");
-                startLoginScreen();
-            }
-        });
+        mainViewModel.getLogin().observe(this, loginObserver);
         mainViewModel.startAuthenticationListener();
+
     }
 
     @Override

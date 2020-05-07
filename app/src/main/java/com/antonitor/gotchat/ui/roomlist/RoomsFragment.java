@@ -9,6 +9,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,19 +17,27 @@ import android.view.ViewGroup;
 import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.FragmentTrendigListBinding;
 import com.antonitor.gotchat.model.ChatRoom;
-import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
 import com.antonitor.gotchat.ui.chatroom.ChatActivity;
+
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link RoomsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RoomsFragment extends Fragment implements RoomListAdapter.OnRoomClickListener{
+public class RoomsFragment extends Fragment implements RoomListAdapter.OnRoomClickListener {
 
+    private static final String LOG_TAG = "ROOMS_FRAGMENT";
     private FragmentTrendigListBinding mDataBinding;
     private RoomListAdapter recyclerViewAdapter;
     private MainViewModel viewModel;
+    private Observer<List<ChatRoom>> roomsObserver = new Observer<List<ChatRoom>>() {
+        @Override
+        public void onChanged(List<ChatRoom> chatRooms) {
+            recyclerViewAdapter.swapChatRooms(chatRooms);
+        }
+    };
 
     public RoomsFragment() {
         // Required empty public constructor
@@ -55,19 +64,21 @@ public class RoomsFragment extends Fragment implements RoomListAdapter.OnRoomCli
         return mDataBinding.getRoot();
     }
 
-    private void setUpRecyclerView(){
+    private void setUpRecyclerView() {
         recyclerViewAdapter = new RoomListAdapter(
-                FirebaseDatabaseRepository.getInstance().getTrendingChatRoomListOptions(),
+                getActivity(),
                 this,
                 viewModel.getCustomUser());
         mDataBinding.trendingRecyclerview.setAdapter(recyclerViewAdapter);
+        viewModel.getChatRooms().observe(getActivity(), roomsObserver);
+
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         mDataBinding.trendingRecyclerview.setLayoutManager(manager);
-        recyclerViewAdapter.startListening();
-        viewModel.getLogin().observe(getActivity(), new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean login) {
-                if (!login) recyclerViewAdapter.stopListening();
+        viewModel.getLogin().observe(getActivity(), login -> {
+            if (!login) {
+                Log.d(LOG_TAG, "LOGIN:FALSE ------ VM:STOPLISTENING -- VM:REMOVEOBSERVER");
+                viewModel.getChatRooms().removeObserver(roomsObserver);
+                viewModel.stopListeningRooms();
             }
         });
     }
@@ -75,9 +86,10 @@ public class RoomsFragment extends Fragment implements RoomListAdapter.OnRoomCli
 
     @Override
     public void onDestroyView() {
+        Log.d(LOG_TAG, "FRAGMENT DESTROYED ------ VM:STOPLISTENING -- VM:REMOVEOBSERVER");
         super.onDestroyView();
-        if (recyclerViewAdapter != null)
-            recyclerViewAdapter.stopListening();
+        viewModel.getChatRooms().removeObserver(roomsObserver);
+        viewModel.stopListeningRooms();
     }
 
 

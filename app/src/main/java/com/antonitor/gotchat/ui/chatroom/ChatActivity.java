@@ -28,12 +28,19 @@ import java.util.List;
 
 public class ChatActivity extends AppCompatActivity {
 
-    private static final String TAG = "CHAT_ACTIVITY";
+    private static final String LOG_TAG = "CHAT_ACTIVITY";
     private static final int RC_PHOTO_PICKER = 1985;
     private static final int RC_CAMERA_ACTION = 2020;
     private ActivityChatRoomBinding dataBinding;
     private ChatViewModel viewModel;
     private ChatAdapter adapter;
+    private Observer<List<Message>> messageObserver = new Observer<List<Message>>() {
+        @Override
+        public void onChanged(List<Message> messages) {
+            adapter.swapMessages(messages);
+            Log.d(LOG_TAG, "-------------------->>>>>>>> New messages: " + messages.size());
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,13 +57,7 @@ public class ChatActivity extends AppCompatActivity {
 
         adapter = new ChatAdapter(this);
         dataBinding.messageRecycleView.setAdapter(adapter);
-        viewModel.getMessages().observe(this, new Observer<List<Message>>() {
-            @Override
-            public void onChanged(List<Message> messages) {
-                adapter.swapMessages(messages);
-                Log.d(TAG, "-------------------->>>>>>>> New messages: " + messages.size());
-            }
-        });
+
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
@@ -152,7 +153,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void sendTextListener(View view) {
-        Log.d(TAG, "SEND CLICKED --------------------------------");
+        Log.d(LOG_TAG, "SEND CLICKED --------------------------------");
         String text = dataBinding.messageEditText.getText().toString()
                 .replaceFirst("\\s+$", "")
                 .replaceFirst("^\\s+", "");
@@ -179,5 +180,19 @@ public class ChatActivity extends AppCompatActivity {
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, RC_CAMERA_ACTION);
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        viewModel.getMessages().removeObservers(this);
+        Log.d(LOG_TAG, "------- REMOVED MESSAGE OBSERVER ON PAUSE ------");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        viewModel.getMessages().observe(this, messageObserver);
+        Log.d(LOG_TAG, "------- ADDED MESSAGE OBSERVER ON RESUME ------");
     }
 }
