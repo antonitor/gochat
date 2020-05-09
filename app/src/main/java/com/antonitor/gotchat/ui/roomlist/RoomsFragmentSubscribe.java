@@ -19,24 +19,25 @@ import android.view.ViewGroup;
 import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.FragmentFollowingListBinding;
 import com.antonitor.gotchat.model.ChatRoom;
-import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
+import com.antonitor.gotchat.sync.FirebaseAuthRepository;
 import com.antonitor.gotchat.ui.chatroom.ChatActivity;
 
+import java.util.List;
 import java.util.Objects;
 
+public class RoomsFragmentSubscribe extends Fragment implements  RoomListAdapter.OnRoomClickListener {
 
-public class RoomsFragmentFollowing extends Fragment implements  RoomListAdapterFollowing.OnRoomClickListener {
-
+    private static final String LOG_TAG = "SUBS_ROOMS_FRAGMENT";
     private FragmentFollowingListBinding mDataBinding;
-    private RoomListAdapterFollowing recyclerViewAdapter;
+    private RoomListAdapter recyclerViewAdapter;
     private MainViewModel viewModel;
 
-    public RoomsFragmentFollowing() {
+    public RoomsFragmentSubscribe() {
         // Required empty public constructor
     }
 
-    static RoomsFragmentFollowing newInstance() {
-        return new RoomsFragmentFollowing();
+    static RoomsFragmentSubscribe newInstance() {
+        return new RoomsFragmentSubscribe();
     }
 
     @Override
@@ -56,29 +57,30 @@ public class RoomsFragmentFollowing extends Fragment implements  RoomListAdapter
     }
 
     private void setUpRecyclerView(){
-        recyclerViewAdapter = new RoomListAdapterFollowing(
-                FirebaseDatabaseRepository.getInstance().getFollowedChatRoomListOptions(),
+        recyclerViewAdapter = new RoomListAdapter(
+                getActivity(),
+                RoomListAdapter.roomTypes.SUBSCRIBED,
                 this,
-                viewModel.getCustomUser());
+                //TODO: Get Custom User From ViewModel for MVVM pattern
+                FirebaseAuthRepository.getInstance().getCustomUser());
         mDataBinding.followingRecyclerview.setAdapter(recyclerViewAdapter);
+        viewModel.getSubscribedChatRooms().observe(getActivity(), new Observer<List<ChatRoom>>() {
+            @Override
+            public void onChanged(List<ChatRoom> chatRooms) {
+                recyclerViewAdapter.swapChatRooms(chatRooms);
+            }
+        });
+
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         mDataBinding.followingRecyclerview.setLayoutManager(manager);
-        recyclerViewAdapter.startListening();
-        viewModel.getLogin().observe(getActivity(), new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean login) {
-                if (!login) recyclerViewAdapter.stopListening();
+        //TODO: Create loginObserver member
+        viewModel.getLogin().observe(getActivity(), login -> {
+            if (!login) {
+                viewModel.stopListeningSubscribedRooms();
             }
         });
     }
 
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (recyclerViewAdapter != null)
-            recyclerViewAdapter.stopListening();
-    }
 
 
     @Override

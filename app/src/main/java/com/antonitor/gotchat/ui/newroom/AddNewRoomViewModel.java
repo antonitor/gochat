@@ -26,7 +26,7 @@ public class AddNewRoomViewModel extends ViewModel {
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
 
     void newChatRoom(String title, String topic, String url, User owner){
-        FirebaseDatabaseRepository.getInstance().newChatRoom(title, title, topic, url, owner);
+        FirebaseDatabaseRepository.getInstance().newChatRoom(title, topic, url);
     }
 
     void uploadImage() {

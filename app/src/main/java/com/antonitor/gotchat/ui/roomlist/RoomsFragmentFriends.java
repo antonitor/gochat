@@ -9,6 +9,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,25 +17,28 @@ import android.view.ViewGroup;
 import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.FragmentOwnRoomsBinding;
 import com.antonitor.gotchat.model.ChatRoom;
-import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
+import com.antonitor.gotchat.sync.FirebaseAuthRepository;
 import com.antonitor.gotchat.ui.chatroom.ChatActivity;
 import com.antonitor.gotchat.ui.newroom.AddNewRoomActivity;
 
+import java.util.List;
+
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link RoomsFragmentOwn#newInstance} factory method to
+ * Use the {@link RoomsFragmentFriends#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RoomsFragmentOwn extends Fragment implements RoomListAdapterOwn.OnRoomClickListener {
+public class RoomsFragmentFriends extends Fragment implements RoomListAdapter.OnRoomClickListener {
 
+    private static final String LOG_TAG = "FRIEND_ROOMS_FRAG";
     private FragmentOwnRoomsBinding mDataBinding;
-    private RoomListAdapterOwn recyclerViewAdapter;
+    private RoomListAdapter recyclerViewAdapter;
     private MainViewModel viewModel;
 
-    public RoomsFragmentOwn() {}
+    public RoomsFragmentFriends() {}
 
-    static RoomsFragmentOwn newInstance() {
-        return new RoomsFragmentOwn();
+    static RoomsFragmentFriends newInstance() {
+        return new RoomsFragmentFriends();
     }
 
     @Override
@@ -44,10 +48,10 @@ public class RoomsFragmentOwn extends Fragment implements RoomListAdapterOwn.OnR
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         mDataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_own_rooms, container, false);
         viewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
         setUpAddFab();
+
         setUpRecyclerView();
 
         return mDataBinding.getRoot();
@@ -56,35 +60,37 @@ public class RoomsFragmentOwn extends Fragment implements RoomListAdapterOwn.OnR
     private void setUpAddFab(){
         mDataBinding.addFab.setOnClickListener(view -> {
             Intent newChatRoomIntent = new Intent(getActivity(), AddNewRoomActivity.class);
-            newChatRoomIntent.putExtra(getString(R.string.extra_userowner), viewModel.getCustomUser());
+            //TODO: Get Custom User From ViewModel for MVVM pattern
+            newChatRoomIntent.putExtra(getString(R.string.extra_userowner), FirebaseAuthRepository.getInstance().getCustomUser());
             getActivity().startActivity(newChatRoomIntent);
         });
     }
 
     private void setUpRecyclerView(){
-        recyclerViewAdapter = new RoomListAdapterOwn(
-                FirebaseDatabaseRepository.getInstance().getOwnChatRoomListOptions(),
+        recyclerViewAdapter = new RoomListAdapter(
+                getActivity(),
+                RoomListAdapter.roomTypes.FRIENDS,
                 this,
-                viewModel.getCustomUser());
+                //TODO: Get Custom User From ViewModel for MVVM pattern
+                FirebaseAuthRepository.getInstance().getCustomUser());
         mDataBinding.ownRecyclerview.setAdapter(recyclerViewAdapter);
+        viewModel.getFriendChatRooms().observe(getActivity(), new Observer<List<ChatRoom>>() {
+            @Override
+            public void onChanged(List<ChatRoom> chatRooms) {
+                recyclerViewAdapter.swapChatRooms(chatRooms);
+            }
+        });
+
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         mDataBinding.ownRecyclerview.setLayoutManager(manager);
-        recyclerViewAdapter.startListening();
-        viewModel.getLogin().observe(getActivity(), new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean login) {
-                if (!login) recyclerViewAdapter.stopListening();
+        viewModel.getLogin().observe(getActivity(), login -> {
+            if (!login) {
+                Log.d(LOG_TAG, "LOGIN:FALSE ------ VM:STOPLISTENING -- VM:REMOVEOBSERVER");
+                viewModel.stopListeningFriendRooms();
             }
         });
     }
 
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (recyclerViewAdapter != null)
-            recyclerViewAdapter.stopListening();
-    }
 
     @Override
     public void onRoomClicked(ChatRoom room) {

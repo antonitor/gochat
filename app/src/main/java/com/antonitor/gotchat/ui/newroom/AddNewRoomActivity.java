@@ -18,6 +18,7 @@ import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.ActivityAddNewRoomBinding;
 import com.antonitor.gotchat.model.User;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import static com.antonitor.gotchat.utilities.Utilities.bitmapByteArray;
 
@@ -36,22 +37,17 @@ public class AddNewRoomActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(AddNewRoomViewModel.class);
         User user = getIntent().getExtras().getParcelable(getString(R.string.extra_userowner));
         viewModel.setOwner(user);
-
-        dataBinding.takePictureButton.setOnClickListener(this::takePictureOnClickListener);
-        dataBinding.addPictureButton.setOnClickListener(this::addPictureOnClickListener);
-        dataBinding.addButton.setOnClickListener(this::addButtonOnClickListener);
-
         viewModel.getIsLoading().observe(this, getLoadingObserver());
     }
 
-    private void takePictureOnClickListener(View view) {
+    public void takePicture(View view) {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, RC_CAMERA_ACTION);
         }
     }
 
-    private void addPictureOnClickListener(View view) {
+    public void selectPicture(View view) {
         Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
         getIntent.setType("image/*");
         Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -85,12 +81,13 @@ public class AddNewRoomActivity extends AppCompatActivity {
                     Glide.with(this)
                             .asBitmap()
                             .load(bitmapByteArray(imageBitmap))
+                            .apply(new RequestOptions().circleCrop())
                             .into(dataBinding.newChatroomIv);
                 }
         }
     }
 
-    private void addButtonOnClickListener(View view) {
+    public void addNewRoom(View view) {
         if (!dataBinding.newChatroomEt.getText().toString().trim().equals("")
                 && !dataBinding.newTextEt.getText().toString().trim().equals("")) {
             final String title = dataBinding.newChatroomEt.getText().toString();
@@ -134,4 +131,5 @@ public class AddNewRoomActivity extends AppCompatActivity {
         dataBinding.textInputLayout2.setEnabled(false);
         dataBinding.newChatroomIv.setImageAlpha(125);
     }
+
 }

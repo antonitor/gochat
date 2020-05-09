@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity  {
         }
     };
 
+    //TODO: Add fab to MainActivity layout instead of fragments
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

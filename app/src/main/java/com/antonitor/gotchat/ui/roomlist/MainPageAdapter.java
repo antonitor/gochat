@@ -22,9 +22,9 @@ public class MainPageAdapter extends FragmentPagerAdapter {
             case 0:
                 return RoomsFragment.newInstance();
             case 1:
-                return RoomsFragmentFollowing.newInstance();
+                return RoomsFragmentSubscribe.newInstance();
             case 2:
-                return RoomsFragmentOwn.newInstance();
+                return RoomsFragmentFriends.newInstance();
             default:
                 return null;
         }

@@ -30,6 +30,8 @@ class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.RoomViewHolde
     private User owner;
     private List<ChatRoom> chatRooms = new ArrayList<>();
     private final OnRoomClickListener onRoomClickListener;
+    enum roomTypes {ALL, SUBSCRIBED, FRIENDS}
+    private roomTypes roomType;
 
     private final ArrayList<ChatRoom> selectedItems = new ArrayList<>();
     private boolean multiSelect = false;
@@ -37,7 +39,16 @@ class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.RoomViewHolde
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             multiSelect = true;
-            menu.add("SUBSCRIBE");
+            switch (roomType) {
+                case ALL:
+                    menu.add("SUBSCRIBE");
+                    break;
+                case SUBSCRIBED:
+                    menu.add("UNSUBSCRIBE");
+                    break;
+                case FRIENDS:
+                    menu.add("DELETE");
+            }
             return true;
         }
 
@@ -48,8 +59,21 @@ class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.RoomViewHolde
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            for (ChatRoom room : selectedItems) {
-                FirebaseDatabaseRepository.getInstance().addFollowingChat(room, owner);
+            switch (roomType) {
+                case ALL:
+                    for (ChatRoom room : selectedItems) {
+                        FirebaseDatabaseRepository.getInstance().addFollowingChat(room);
+                    }
+                    break;
+                case SUBSCRIBED:
+                    for (ChatRoom room : selectedItems) {
+                        FirebaseDatabaseRepository.getInstance().unFollowChat(room);
+                    }
+                    break;
+                case FRIENDS:
+                    for (ChatRoom room : selectedItems) {
+                        FirebaseDatabaseRepository.getInstance().removeChatRoom(room.getId());
+                    }
             }
             mode.finish();
             return true;
@@ -68,8 +92,9 @@ class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.RoomViewHolde
     }
 
 
-    RoomListAdapter(Context context, OnRoomClickListener onRoomClickListener, User owner) {
+    RoomListAdapter(Context context, roomTypes roomType, OnRoomClickListener onRoomClickListener, User owner) {
         this.mContext = context;
+        this.roomType = roomType;
         this.onRoomClickListener = onRoomClickListener;
         this.owner = owner;
     }

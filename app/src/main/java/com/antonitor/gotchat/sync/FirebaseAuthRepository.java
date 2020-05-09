@@ -2,8 +2,12 @@ package com.antonitor.gotchat.sync;
 
 import android.util.Log;
 
+import com.antonitor.gotchat.model.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import androidx.annotation.NonNull;
 
@@ -16,24 +20,42 @@ public class FirebaseAuthRepository {
     private AuthCallback authCallback;
     private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
+    private User customUser;
+    private boolean listeningFlag =false ;
     private FirebaseAuth.AuthStateListener mAuthStateListener = new FirebaseAuth.AuthStateListener() {
         @Override
         public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
             firebaseUser = firebaseAuth.getCurrentUser();
             if (firebaseUser != null) {
-                Log.d(LOG_TAG, "------- LOGGED AS " + firebaseUser.getPhoneNumber() + " ---------");
-                authCallback.login(firebaseUser);
+                FirebaseDatabaseRepository.getInstance().getUserChatsReference().child(firebaseUser.getUid())
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                User user = dataSnapshot.getValue(User.class);
+                                if (user != null) {
+                                    customUser = user;
+                                } else {
+                                    customUser = new User(firebaseUser.getUid());
+                                    FirebaseDatabaseRepository.getInstance().getUserChatsReference().child(firebaseUser.getUid()).setValue(customUser);
+                                }
+                                authCallback.login();
+                                Log.d(LOG_TAG, "------- LOGGED AS " + firebaseUser.getPhoneNumber() + " ---------");
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                Log.d(LOG_TAG, "-------- USER CHATS CANCELLED  -------");
+                            }
+                        });
             } else {
                 Log.d(LOG_TAG, "------- NOT LOGGED IN  ---------");
                 authCallback.loggedOut();
             }
         }
     };
-    private boolean listeningFlag =false ;
-
 
     public interface AuthCallback {
-        void login(FirebaseUser user);
+        void login();
         void loggedOut();
     }
 
@@ -59,6 +81,12 @@ public class FirebaseAuthRepository {
         firebaseAuth.addAuthStateListener(mAuthStateListener);
     }
 
+
+
+
+
+
+
     public void singOut() {
         firebaseAuth.signOut();
     }
@@ -81,5 +109,9 @@ public class FirebaseAuthRepository {
 
     public void setListeningFlag(boolean listeningFlag) {
         this.listeningFlag = listeningFlag;
+    }
+
+    public User getCustomUser() {
+        return customUser;
     }
 }
