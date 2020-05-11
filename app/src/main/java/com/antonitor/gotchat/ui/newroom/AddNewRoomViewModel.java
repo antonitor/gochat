@@ -7,8 +7,6 @@ import android.util.Log;
 import com.antonitor.gotchat.model.User;
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
 import com.antonitor.gotchat.sync.FirebaseStorageRepository;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.storage.UploadTask;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -31,54 +29,49 @@ public class AddNewRoomViewModel extends ViewModel {
 
     void uploadImage() {
         if (bitmap != null) {
-            UploadTask upTask = FirebaseStorageRepository.getInstance()
-                    .uploadBitmap(bitmap, FirebaseStorageRepository.getInstance()
-                            .getRoomImageStorageReference());
-            upTask.addOnSuccessListener(taskSnapshot -> {
-                Log.d(TAG, "SUCCESSFUL BITMAP UPLOAD");
-                Log.d(TAG, "File: " + taskSnapshot.getMetadata().getName());
-                Log.d(TAG, "Path: " + taskSnapshot.getMetadata().getPath());
-                Log.d(TAG, "Size: " + taskSnapshot.getMetadata().getSizeBytes()/1000 + " kb");
-                Log.d(TAG, "Encoding: " + taskSnapshot.getMetadata().getContentEncoding());
-                Log.d(TAG, "Upload time: " + taskSnapshot.getMetadata().getUpdatedTimeMillis()/1000 + " sec.");
-                Task<Uri> urlTask = taskSnapshot.getMetadata().getReference().getDownloadUrl();
-                while (!urlTask.isSuccessful()) ;
-                Uri downloadUrl = urlTask.getResult();
-                imageUrl.postValue(downloadUrl.toString());
-                isLoading.postValue(false);
-            }).addOnProgressListener(taskSnapshot -> {
-                isLoading.postValue(true);
-                uploadProgress.postValue(100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-            }).addOnFailureListener(e -> {
-                imageUrl.postValue(null);
-                Log.d(TAG, "FAILED BITMAP UPLOAD");
-                Log.d(TAG, e.getMessage());
-            });
-        } else if (localImageUri!=null) {
-            UploadTask upTask = FirebaseStorageRepository.getInstance().uploadFromLocal(localImageUri);
-            upTask.addOnSuccessListener(taskSnapshot -> {
-                Log.d(TAG, "SUCCESSFUL BITMAP UPLOAD");
-                Log.d(TAG, "File: " + taskSnapshot.getMetadata().getName());
-                Log.d(TAG, "Path: " + taskSnapshot.getMetadata().getPath());
-                Log.d(TAG, "Size: " + taskSnapshot.getMetadata().getSizeBytes()/1000 + " kb");
-                Log.d(TAG, "Encoding: " + taskSnapshot.getMetadata().getContentEncoding());
-                Log.d(TAG, "Upload time: " + taskSnapshot.getMetadata().getUpdatedTimeMillis()/1000 + " sec.");
-                Task<Uri> urlTask = taskSnapshot.getMetadata().getReference().getDownloadUrl();
-                while (!urlTask.isSuccessful()) ;
-                Uri downloadUrl = urlTask.getResult();
-                imageUrl.postValue(downloadUrl.toString());
-                isLoading.postValue(false);
-            }).addOnFailureListener(e -> {
-                imageUrl.postValue(null);
-                Log.d(TAG, "FAILED BITMAP UPLOAD");
-                Log.d(TAG, e.getMessage());
-            }).addOnProgressListener(taskSnapshot -> {
-                isLoading.postValue(true);
-                uploadProgress.postValue(100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-            });
-        } else {
-            Log.d(TAG, "USER HAVEN'T SELECTED ANY IMAGE");
-            imageUrl.postValue(null);
+            FirebaseStorageRepository storageRepository = FirebaseStorageRepository.getInstance();
+            storageRepository.uploadBitmap(bitmap, storageRepository.getRoomImgRef(),
+                    new FirebaseStorageRepository.UploadCallback() {
+                        @Override
+                        public void onComplete(String downloadUrl) {
+                            imageUrl.postValue(downloadUrl);
+                            isLoading.postValue(false);
+                        }
+
+                        @Override
+                        public void onProgress(Double progress) {
+                            isLoading.postValue(true);
+                            uploadProgress.postValue(progress);
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            imageUrl.postValue(null);
+                            Log.d(TAG, e.getMessage());
+                        }
+                    });
+        } else if (localImageUri != null) {
+            FirebaseStorageRepository.getInstance().uploadFromLocal(localImageUri,
+                    FirebaseStorageRepository.getInstance().getMsgImgRef(),
+                    new FirebaseStorageRepository.UploadCallback() {
+                        @Override
+                        public void onComplete(String downloadUrl) {
+                            imageUrl.postValue(downloadUrl);
+                            isLoading.postValue(false);
+                        }
+
+                        @Override
+                        public void onProgress(Double progress) {
+                            isLoading.postValue(true);
+                            uploadProgress.postValue(progress);
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            imageUrl.postValue(null);
+                            Log.d(TAG, e.getMessage());
+                        }
+                    });
         }
     }
 
