@@ -5,12 +5,10 @@ import android.util.Log;
 import com.antonitor.gotchat.model.ChatRoom;
 import com.antonitor.gotchat.model.Message;
 import com.antonitor.gotchat.model.User;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -135,9 +133,6 @@ public class FirebaseDatabaseRepository {
             }
         };
     }
-
-
-
 
 
     /**

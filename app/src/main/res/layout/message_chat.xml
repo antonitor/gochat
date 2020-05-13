@@ -45,7 +45,8 @@
                 android:layout_gravity="center"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/cd_image_send_by_user"
-                android:visibility="visible"/>
+                android:visibility="visible"
+                android:transitionName="image_chat_message"/>
 
 
             <ProgressBar

@@ -1,6 +1,8 @@
 package com.antonitor.gotchat.model;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -9,7 +11,7 @@ import com.google.firebase.database.ServerValue;
 
 import androidx.databinding.BindingAdapter;
 
-public class Message {
+public class Message implements Parcelable {
 
     private String messageUUID;
     private String roomID;
@@ -31,6 +33,27 @@ public class Message {
         this.photoUrl = photoUrl;
         this.timeStamp = ServerValue.TIMESTAMP;
     }
+
+    protected Message(Parcel in) {
+        messageUUID = in.readString();
+        roomID = in.readString();
+        text = in.readString();
+        author = in.readString();
+        localPhotoUrl = in.readString();
+        photoUrl = in.readString();
+    }
+
+    public static final Creator<Message> CREATOR = new Creator<Message>() {
+        @Override
+        public Message createFromParcel(Parcel in) {
+            return new Message(in);
+        }
+
+        @Override
+        public Message[] newArray(int size) {
+            return new Message[size];
+        }
+    };
 
     public String getMessageUUID() {
         return messageUUID;
@@ -100,5 +123,20 @@ public class Message {
         Glide.with(view.getContext())
                 .load(photoUrl).apply(new RequestOptions().circleCrop())
                 .into(view);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(messageUUID);
+        parcel.writeString(roomID);
+        parcel.writeString(text);
+        parcel.writeString(author);
+        parcel.writeString(localPhotoUrl);
+        parcel.writeString(photoUrl);
     }
 }

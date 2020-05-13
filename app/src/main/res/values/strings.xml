@@ -32,4 +32,6 @@
     <string name="extra_userowner">owner-user</string>
     <string name="menu_logout">logout</string>
     <string name="title">GoChat!</string>
+    <string name="extra_image_message">extra-message-image</string>
+    <string name="send_to">SEND TO:</string>
 </resources>

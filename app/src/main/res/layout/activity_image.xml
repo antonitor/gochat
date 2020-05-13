@@ -12,5 +12,5 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:contentDescription="@string/cd_showing_original_size_image"
-            app:messageImage="@{image}"/>
+            android:transitionName="image_chat_message"/>
 </layout>

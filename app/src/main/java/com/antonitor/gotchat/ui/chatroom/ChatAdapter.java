@@ -1,6 +1,8 @@
 package com.antonitor.gotchat.ui.chatroom;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.util.Log;
@@ -16,11 +18,8 @@ import com.antonitor.gotchat.model.Message;
 
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
 import com.antonitor.gotchat.sync.FirebaseStorageRepository;
+import com.antonitor.gotchat.ui.image.ImageActivity;
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.storage.OnProgressListener;
-import com.google.firebase.storage.UploadTask;
 
 
 import java.util.ArrayList;
@@ -29,6 +28,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -89,9 +89,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
     @Override
     public void onViewRecycled(@NonNull MessageViewHolder holder) {
         super.onViewRecycled(holder);
-        Log.d(TAG,"------------ RECYCLED HOLDER "+ holder.getAdapterPosition() + " -------------------");
+        Log.d(TAG, "------------ RECYCLED HOLDER " + holder.getAdapterPosition() + " -------------------");
         Glide.with(holder.itemView.getContext())
-                .clear(((MessageViewHolder)holder).dataBinding.photoImageView);
+                .clear(((MessageViewHolder) holder).dataBinding.photoImageView);
     }
 
     @Override
@@ -149,23 +149,23 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
             this.mMessage = message;
             dataBinding.setMessage(mMessage);
             dataBinding.executePendingBindings();
-            if (message.getLocalPhotoUrl()!= null) {
+            if (message.getLocalPhotoUrl() != null) {
                 dataBinding.messageTv.setVisibility(View.GONE);
                 dataBinding.photoImageView.setVisibility(View.VISIBLE);
-                Log.d(TAG, "----------- GLIDE LOADING LOCAL IMAGE " + getAdapterPosition() +" ----------");
+                Log.d(TAG, "----------- GLIDE LOADING LOCAL IMAGE " + getAdapterPosition() + " ----------");
                 Glide.with(mContext)
                         .load(message.getLocalPhotoUrl())
                         .centerCrop()
                         .into(dataBinding.photoImageView);
-                if (message.getPhotoUrl()== null) {
+                if (message.getPhotoUrl() == null) {
                     dataBinding.progressBarPictureUpload.setVisibility(View.VISIBLE);
                     uploadImage();
                 }
-            } else if (message.getPhotoUrl()!=null) {
-                Log.d(TAG, "----------- GLIDE LOADING CLOUD IMAGE " + getAdapterPosition() +" ---------");
+            } else if (message.getPhotoUrl() != null) {
+                Log.d(TAG, "----------- GLIDE LOADING CLOUD IMAGE " + getAdapterPosition() + " ---------");
                 //DOWNLOAD IMAGE
             } else {
-                Log.d(TAG, "----------- NO IMAGE MESSAGE " + getAdapterPosition() +" -------------------");
+                Log.d(TAG, "----------- NO IMAGE MESSAGE " + getAdapterPosition() + " -------------------");
                 dataBinding.photoImageView.setVisibility(View.GONE);
                 dataBinding.messageTv.setVisibility(View.VISIBLE);
             }
@@ -177,6 +177,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
                 } else {
                     selectItem();
                 }
+            });
+            dataBinding.photoImageView.setOnClickListener(view -> {
+                Intent intent = new Intent(view.getContext(), ImageActivity.class);
+                intent.putExtra(mContext.getString(R.string.extra_image_message), message);
+                ActivityOptionsCompat options = ActivityOptionsCompat.
+                        makeSceneTransitionAnimation((Activity)mContext, dataBinding.photoImageView, "image_chat_message");
+                view.getContext().startActivity(intent, options.toBundle());
             });
             update();
         }
@@ -207,35 +214,35 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
-                    ((AppCompatActivity)view.getContext()).startSupportActionMode(actionModeCallbacks);
+                    ((AppCompatActivity) view.getContext()).startSupportActionMode(actionModeCallbacks);
                     selectItem();
                     return true;
                 }
             });
         }
 
-        void uploadImage(){
+        void uploadImage() {
             Uri localImageURI = Uri.parse(mMessage.getLocalPhotoUrl());
-            UploadTask task = FirebaseStorageRepository.getInstance().uploadFromLocal(localImageURI);
-            task.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                    dataBinding.progressBarPictureUpload.setVisibility(View.GONE);
-                    Uri downloadUrl = task.getResult().getUploadSessionUri();
-                    mMessage.setPhotoUrl(downloadUrl.toString());
-                    FirebaseDatabaseRepository.getInstance().updateMessage(mMessage);
-                    Log.v(TAG, "SUCCESSFUL BITMAP UPLOAD");
-                    Log.v(TAG, "File: " + task.getResult().getMetadata().getName());
-                    Log.v(TAG, "Path: " + task.getResult().getMetadata().getPath());
-                    Log.v(TAG, "Size: " + task.getResult().getMetadata().getSizeBytes()/1000 + " kb");
-                }
-            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                    Double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                    dataBinding.progressBarPictureUpload.setProgress(progress.intValue());
-                }
-            });
+            FirebaseStorageRepository.getInstance().uploadFromLocal(localImageURI,
+                    FirebaseStorageRepository.getInstance().getMsgImgRef(),
+                    new FirebaseStorageRepository.UploadCallback() {
+                        @Override
+                        public void onComplete(String downloadUrl) {
+                            dataBinding.progressBarPictureUpload.setVisibility(View.GONE);
+                            mMessage.setPhotoUrl(downloadUrl);
+                            FirebaseDatabaseRepository.getInstance().updateMessage(mMessage);
+                        }
+
+                        @Override
+                        public void onProgress(Double progress) {
+                            dataBinding.progressBarPictureUpload.setProgress(progress.intValue());
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+
+                        }
+                    });
         }
     }
 }

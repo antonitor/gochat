@@ -8,7 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorButtonNormal">@drawable/button_selector</item>
         <item name="android:buttonStyle">@style/ButtonStyle</item>
-        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:windowContentTransitions">true</item>
     </style>
 
 
@@ -16,6 +16,7 @@
     <style name="ActionModeTheme" parent="AppTheme">
         <item name="actionModeStyle">@style/GoChatActionModeStyle</item>
         <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeBackground">@color/colorPrimaryDark</item>
         <item name="actionMenuTextColor">@color/white</item>
 
     </style>
@@ -59,6 +60,13 @@
 
     <style name="GoChatActionModeStyle" parent="Base.Widget.AppCompat.ActionMode">
         <item name="actionModeBackground">@color/colorPrimary</item>
+        <item name="backgroundColor">@color/colorPrimaryDark</item>
     </style>
+
+    <style name="NoTitleActivity" parent="AppTheme">
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+
 
 </resources>

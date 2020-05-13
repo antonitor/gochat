@@ -5,7 +5,6 @@ import android.util.Log;
 import com.antonitor.gotchat.model.ChatRoom;
 import com.antonitor.gotchat.sync.FirebaseAuthRepository;
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 
