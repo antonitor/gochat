@@ -29,6 +29,21 @@ public class AddNewRoomActivity extends AppCompatActivity {
 
     private ActivityAddNewRoomBinding dataBinding;
     private AddNewRoomViewModel viewModel;
+    private Observer<Boolean> loadingObserver = new Observer<Boolean>() {
+        @Override
+        public void onChanged(Boolean isLoading) {
+            if(isLoading) {
+                disableViewsWhileLoading();
+                Observer<Double> progress = aDouble -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        dataBinding.progressBarPictureUpload.setProgress(aDouble.intValue(), true);
+                    }
+                };
+                viewModel.getUploadProgress().observe(AddNewRoomActivity.this, progress);
+            }
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +52,7 @@ public class AddNewRoomActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(AddNewRoomViewModel.class);
         User user = getIntent().getExtras().getParcelable(getString(R.string.extra_userowner));
         viewModel.setOwner(user);
-        viewModel.getIsLoading().observe(this, getLoadingObserver());
+        viewModel.getIsLoading().observe(this, loadingObserver);
     }
 
     public void takePicture(View view) {
@@ -107,26 +122,11 @@ public class AddNewRoomActivity extends AppCompatActivity {
         }
     }
 
-    private Observer<Boolean> getLoadingObserver() {
-        return isLoading -> {
-            if(isLoading) {
-                disableViewsWhileLoading();
-                Observer<Double> progress = aDouble -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        dataBinding.progressBarPictureUpload.setProgress(aDouble.intValue(), true);
-                    }
-                };
-                viewModel.getUploadProgress().observe(AddNewRoomActivity.this, progress);
-            }
-        };
-    }
-
     private void disableViewsWhileLoading() {
         dataBinding.progressBarPictureUpload.setVisibility(View.VISIBLE);
         dataBinding.takePictureButton.setEnabled(false);
         dataBinding.addPictureButton.setEnabled(false);
         dataBinding.addButton.setEnabled(false);
-        dataBinding.cancelButton.setEnabled(false);
         dataBinding.textInputLayout.setEnabled(false);
         dataBinding.textInputLayout2.setEnabled(false);
         dataBinding.newChatroomIv.setImageAlpha(125);
