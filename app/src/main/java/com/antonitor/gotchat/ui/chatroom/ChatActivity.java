@@ -1,5 +1,6 @@
 package com.antonitor.gotchat.ui.chatroom;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
@@ -14,6 +15,8 @@ import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.antonitor.gotchat.R;
@@ -81,9 +84,6 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        //Handle user input
-        dataBinding.sendButton.setOnClickListener(ChatActivity.this::takePhotoListener);
-        dataBinding.photoPickerButton.setOnClickListener(ChatActivity.this::sendImageListener);
         dataBinding.messageEditText.addTextChangedListener(userInputWatcher());
     }
 
@@ -101,19 +101,33 @@ public class ChatActivity extends AppCompatActivity {
                 public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                     if (charSequence.toString().trim().length() > 0) {
                         dataBinding.sendButton.setImageResource(R.drawable.ic_send_white_24dp);
-                        dataBinding.sendButton.setOnClickListener(ChatActivity.this::sendTextListener);
+                        dataBinding.sendButton.setOnClickListener(ChatActivity.this::sendText);
                         dataBinding.photoPickerButton.setVisibility(View.INVISIBLE);
                     } else {
                         dataBinding.sendButton.setImageResource(R.drawable.ic_camera_grey_24dp);
-                        dataBinding.sendButton.setOnClickListener(ChatActivity.this::takePhotoListener);
+                        dataBinding.sendButton.setOnClickListener(ChatActivity.this::takePhoto);
                         dataBinding.photoPickerButton.setVisibility(View.VISIBLE);
-                        dataBinding.photoPickerButton.setOnClickListener(ChatActivity.this::sendImageListener);
+                        dataBinding.photoPickerButton.setOnClickListener(ChatActivity.this::sendImage);
                     }
                 }
                 @Override
                 public void afterTextChanged(Editable editable) {
                 }
             };
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.room, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_invite:
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -152,7 +166,7 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    private void sendTextListener(View view) {
+    public void sendText(View view) {
         Log.d(LOG_TAG, "SEND CLICKED --------------------------------");
         String text = dataBinding.messageEditText.getText().toString()
                 .replaceFirst("\\s+$", "")
@@ -165,7 +179,7 @@ public class ChatActivity extends AppCompatActivity {
         FirebaseDatabaseRepository.getInstance().postMessage(message);
     }
 
-    private void sendImageListener(View view) {
+    public void sendImage(View view) {
         Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
         getIntent.setType("image/*");
         Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -175,7 +189,7 @@ public class ChatActivity extends AppCompatActivity {
         startActivityForResult(chooserIntent, RC_PHOTO_PICKER);
     }
 
-    private void takePhotoListener(View view) {
+    public void takePhoto(View view) {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, RC_CAMERA_ACTION);

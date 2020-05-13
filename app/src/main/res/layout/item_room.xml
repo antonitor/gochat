@@ -21,23 +21,24 @@
             android:layout_marginStart="72dp"
             android:layout_marginTop="8dp"
             android:maxLines="1"
+            android:text="@{chatroom.title}"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
             app:layout_constraintEnd_toStartOf="@+id/guideline3"
             app:layout_constraintStart_toStartOf="@+id/guideline"
-            app:layout_constraintTop_toTopOf="parent"
-            android:text="@{chatroom.title}"/>
+            app:layout_constraintTop_toTopOf="@+id/chatroom_image" />
 
         <TextView
             android:id="@+id/tv_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="72dp"
+            android:layout_marginTop="8dp"
             android:maxLines="1"
+            android:text="@{chatroom.topic}"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             app:layout_constraintEnd_toStartOf="@+id/guideline3"
             app:layout_constraintStart_toStartOf="@+id/guideline"
-            app:layout_constraintTop_toBottomOf="@+id/tv_title"
-            android:text="@{chatroom.topic}" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_title" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline3"
@@ -47,50 +48,6 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintGuide_end="17dp" />
-
-        <Button
-            android:id="@+id/follow_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/fui_transparent"
-            android:contentDescription="@string/dc_subscribe"
-            android:text="@string/follow"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/guideline3"
-            app:layout_constraintTop_toBottomOf="@+id/tv_text" />
-
-        <ImageButton
-            android:id="@+id/share_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="24dp"
-            android:background="@color/fui_transparent"
-            android:contentDescription="@string/dc_invite_friends_to_this_channel"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/follow_button"
-            app:layout_constraintTop_toBottomOf="@+id/tv_text"
-            app:srcCompat="@drawable/ic_share_black_24dp" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="2dp"
-            android:contentDescription="@string/people_count_icon"
-            android:src="@drawable/ic_people_black_24dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/users_count_tv"
-            app:layout_constraintTop_toBottomOf="@+id/tv_text" />
-
-        <TextView
-            android:id="@+id/users_count_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="24dp"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/share_button"
-            app:layout_constraintTop_toBottomOf="@+id/tv_text"
-            tools:text="99" />
 
         <ImageView
             android:id="@+id/chatroom_image"
@@ -112,20 +69,20 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/guideline3"
-            app:layout_constraintStart_toStartOf="@+id/follow_button"
-            app:layout_constraintTop_toTopOf="@+id/follow_button" />
+            app:layout_constraintEnd_toStartOf="@+id/guideline3" />
 
         <View
             android:id="@+id/view2"
             android:layout_width="0dp"
             android:layout_height="1dp"
             android:layout_marginStart="72dp"
+            android:layout_marginTop="8dp"
             android:background="@color/colorPrimaryDark"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline3"
             app:layout_constraintHorizontal_bias="0.49"
-            app:layout_constraintStart_toStartOf="@+id/chatroom_image" />
+            app:layout_constraintStart_toStartOf="@+id/chatroom_image"
+            app:layout_constraintTop_toBottomOf="@+id/chatroom_image" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

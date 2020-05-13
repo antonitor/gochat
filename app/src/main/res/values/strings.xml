@@ -34,4 +34,5 @@
     <string name="title">GoChat!</string>
     <string name="extra_image_message">extra-message-image</string>
     <string name="send_to">SEND TO:</string>
+    <string name="menu_invite">invite</string>
 </resources>
