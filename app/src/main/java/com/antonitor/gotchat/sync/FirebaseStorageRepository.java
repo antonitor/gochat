@@ -74,7 +74,6 @@ public class FirebaseStorageRepository {
                 Log.d(LOG_TAG, "File: " + taskSnapshot.getMetadata().getName());
                 Log.d(LOG_TAG, "Path: " + taskSnapshot.getMetadata().getPath());
                 Log.d(LOG_TAG, "Size: " + taskSnapshot.getMetadata().getSizeBytes() / 1000 + " kb");
-                callback.onComplete(downloadUrl.toString());
             }
         }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
             @Override

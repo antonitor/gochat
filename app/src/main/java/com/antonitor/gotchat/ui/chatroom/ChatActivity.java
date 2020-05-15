@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -24,8 +25,11 @@ import com.antonitor.gotchat.databinding.ActivityChatRoomBinding;
 import com.antonitor.gotchat.model.Message;
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
 import com.antonitor.gotchat.sync.FirebaseAuthRepository;
+import com.antonitor.gotchat.sync.FirebaseStorageRepository;
+import com.antonitor.gotchat.utilities.Utilities;
 import com.vanniktech.emoji.EmojiPopup;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -136,34 +140,58 @@ public class ChatActivity extends AppCompatActivity {
             case RC_PHOTO_PICKER:
                 if (resultCode == RESULT_OK) {
                     Uri localImage = data.getData();
-                    Message tempMsg = new Message(
-                            null,
-                            viewModel.getChatRoom().getId(),
-                            viewModel.getCustomUser().getUserName(),
-                            viewModel.getCustomUser().getUUID(),
-                            null,
-                            null,
-                            localImage.toString(),
-                            null);
-                    FirebaseDatabaseRepository.getInstance().postMessage(tempMsg);
+                    try {
+                        Bitmap thumbnail = MediaStore.Images.Media.getBitmap(getContentResolver(), localImage);
+                        FirebaseStorageRepository.getInstance().uploadBitmap(thumbnail, FirebaseStorageRepository.getInstance().getMsgImgRef(), new FirebaseStorageRepository.UploadCallback() {
+                            @Override
+                            public void onComplete(String downloadUrl) {
+                                Log.d(LOG_TAG, " ------------PICKER MESSAGE WITH THUMBNAIL POSTED!! -------------");
+                                Message tempMsg = new Message(
+                                        null,
+                                        viewModel.getChatRoom().getId(),
+                                        viewModel.getCustomUser().getUserName(),
+                                        viewModel.getCustomUser().getUUID(),
+                                        null,
+                                        downloadUrl,
+                                        localImage.toString(),
+                                        null);
+                                FirebaseDatabaseRepository.getInstance().postMessage(tempMsg);
+                            }
+                            @Override
+                            public void onProgress(Double progress) {}
+                            @Override
+                            public void onFailure(Exception e) {}
+                        });
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 }
             case RC_CAMERA_ACTION:
-                /*
                 if (resultCode == RESULT_OK)  {
-                    viewModel.setBitmap((Bitmap) data.getExtras().get("data"));
-                    viewModel.uploadImage(FirebaseStorageRepository.getInstance()
-                            .getMsgImageStorageReference(), );
-                    viewModel.getImageUrl().observe(this, url -> {
-                        Message message = new Message(viewModel.getChatRoom().getId(),
-                                null,
-                                FirebaseDatabaseRepository.getInstance().getFirebaseUser().getPhoneNumber(),
-                                url);
-                        viewModel.postMessage(message);
+                    Bitmap photo = ((Bitmap) data.getExtras().get("data"));
+                    Bitmap thumbnail = Utilities.getThumbnail(photo);
+                    FirebaseStorageRepository.getInstance().uploadBitmap(thumbnail, FirebaseStorageRepository.getInstance().getMsgImgRef(), new FirebaseStorageRepository.UploadCallback() {
+                        @Override
+                        public void onComplete(String downloadUrl) {
+                            Log.d(LOG_TAG, " ------------CAMERA MESSAGE WITH THUMBNAIL POSTED!! -------------");
+                            Message tempMsg = new Message(
+                                    null,
+                                    viewModel.getChatRoom().getId(),
+                                    viewModel.getCustomUser().getUserName(),
+                                    viewModel.getCustomUser().getUUID(),
+                                    null,
+                                    downloadUrl,
+                                    null,
+                                    null);
+                            FirebaseDatabaseRepository.getInstance().postMessage(tempMsg);
+                        }
+                        @Override
+                        public void onProgress(Double progress) {}
+                        @Override
+                        public void onFailure(Exception e) {}
                     });
                 }
-
-                 */
         }
     }
 

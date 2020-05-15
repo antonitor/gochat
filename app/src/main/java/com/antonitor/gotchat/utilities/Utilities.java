@@ -3,10 +3,7 @@ package com.antonitor.gotchat.utilities;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
-import android.net.Uri;
-import android.provider.MediaStore;
 
 import java.io.ByteArrayOutputStream;
 
@@ -14,7 +11,7 @@ import androidx.core.app.ActivityCompat;
 
 public class Utilities {
 
-    private static final int THUMBSIZE = 100;
+    private static final int THUMBSIZE = 400;
 
     public static byte[] bitmapByteArray(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

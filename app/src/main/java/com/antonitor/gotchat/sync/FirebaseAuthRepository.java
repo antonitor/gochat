@@ -3,6 +3,8 @@ package com.antonitor.gotchat.sync;
 import android.util.Log;
 
 import com.antonitor.gotchat.model.User;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -21,7 +23,7 @@ public class FirebaseAuthRepository {
     private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
     private User customUser;
-    private boolean listeningFlag =false ;
+    private boolean listeningFlag = false;
     private FirebaseAuth.AuthStateListener mAuthStateListener = new FirebaseAuth.AuthStateListener() {
         @Override
         public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -35,11 +37,12 @@ public class FirebaseAuthRepository {
                                 if (user != null) {
                                     customUser = user;
                                 } else {
-                                    customUser = new User(firebaseUser.getUid(), firebaseUser.getEmail(), firebaseUser.getDisplayName());
+                                    String tempName = firebaseUser.getEmail().split("@")[0];
+                                    customUser = new User(firebaseUser.getUid(), firebaseUser.getEmail(), tempName);
                                     FirebaseDatabaseRepository.getInstance().getUserChatsReference().child(firebaseUser.getUid()).setValue(customUser);
                                 }
                                 authCallback.login();
-                                Log.d(LOG_TAG, "------- LOGGED AS " + firebaseUser.getPhoneNumber() + " ---------");
+                                Log.d(LOG_TAG, "------- LOGGED AS " + customUser.getUserName() + " ---------");
                             }
 
                             @Override
@@ -56,6 +59,7 @@ public class FirebaseAuthRepository {
 
     public interface AuthCallback {
         void login();
+
         void loggedOut();
     }
 
@@ -82,18 +86,13 @@ public class FirebaseAuthRepository {
     }
 
 
-
-
-
-
-
     public void singOut() {
         firebaseAuth.signOut();
     }
 
     public void removeAuthListener() {
         Log.d(LOG_TAG, "------- REMOVING AUTH LISTENER ---------");
-        if (mAuthStateListener!=null) {
+        if (mAuthStateListener != null) {
             firebaseAuth.removeAuthStateListener(mAuthStateListener);
             setListeningFlag(false);
         }

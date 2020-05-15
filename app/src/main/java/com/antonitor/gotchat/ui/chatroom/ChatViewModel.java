@@ -62,4 +62,6 @@ public class ChatViewModel extends ViewModel {
     public User getCustomUser() {
         return FirebaseAuthRepository.getInstance().getCustomUser();
     }
+
+
 }

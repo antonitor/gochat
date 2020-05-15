@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity  {
 
         startActivity(AuthUI.getInstance()
                 .createSignInIntentBuilder()
+                .setIsSmartLockEnabled(false)
                 .setLogo(R.mipmap.ic_launcher)
                 .setTheme(R.style.AppTheme)
                 .setAvailableProviders(providers)

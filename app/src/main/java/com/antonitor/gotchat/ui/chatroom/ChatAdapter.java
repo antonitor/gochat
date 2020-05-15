@@ -150,31 +150,24 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
             this.mMessage = message;
             dataBinding.setMessage(mMessage);
             dataBinding.executePendingBindings();
-            if (message.getLocalPhotoUrl() != null && FirebaseAuthRepository.getInstance()
-                    .getCustomUser().getUUID() == message.getAuthorUUID()) {
+
+            if (message.getThumbnail()!= null) {
                 dataBinding.messageTv.setVisibility(View.GONE);
-                dataBinding.photoImageView.setVisibility(View.VISIBLE);
-                Log.d(TAG, "----------- GLIDE LOADING LOCAL IMAGE " + getAdapterPosition() + " ----------");
                 Glide.with(mContext)
-                        .load(message.getLocalPhotoUrl())
-                        .centerCrop()
-                        .into(dataBinding.photoImageView);
-                if (message.getPhotoUrl() == null) {
-                    dataBinding.progressBarPictureUpload.setVisibility(View.VISIBLE);
-                    uploadImage();
-                }
-            } else if (message.getPhotoUrl() != null) {
-                Log.d(TAG, "----------- GLIDE LOADING CLOUD IMAGE " + getAdapterPosition() + " ---------");
-                dataBinding.messageTv.setVisibility(View.GONE);
-                dataBinding.photoImageView.setVisibility(View.VISIBLE);
-                Glide.with(mContext)
-                        .load(message.getPhotoUrl())
+                        .load(message.getThumbnail())
                         .centerCrop()
                         .into(dataBinding.photoImageView);
             } else {
                 Log.d(TAG, "----------- NO IMAGE MESSAGE " + getAdapterPosition() + " -------------------");
                 dataBinding.photoImageView.setVisibility(View.GONE);
                 dataBinding.messageTv.setVisibility(View.VISIBLE);
+            }
+
+
+            if (message.getLocalPhotoUrl() != null && FirebaseAuthRepository.getInstance()
+                    .getCustomUser().getUUID() == message.getAuthorUUID() && message.getPhotoUrl() == null){
+                    dataBinding.progressBarPictureUpload.setVisibility(View.VISIBLE);
+                    uploadImage();
             }
 
             dataBinding.authorTv.setOnClickListener(view -> {
@@ -192,6 +185,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
                         makeSceneTransitionAnimation((Activity)mContext, dataBinding.photoImageView, "image_chat_message");
                 view.getContext().startActivity(intent, options.toBundle());
             });
+
             update();
         }
 
