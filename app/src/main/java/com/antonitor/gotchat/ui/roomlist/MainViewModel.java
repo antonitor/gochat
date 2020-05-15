@@ -3,6 +3,7 @@ package com.antonitor.gotchat.ui.roomlist;
 import android.util.Log;
 
 import com.antonitor.gotchat.model.ChatRoom;
+import com.antonitor.gotchat.model.User;
 import com.antonitor.gotchat.sync.FirebaseAuthRepository;
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
 
@@ -142,6 +143,8 @@ public class MainViewModel extends ViewModel {
         databaseRepository.removeFriendRoomsListener();
     }
 
-
+    public User getCustomUser() {
+        return FirebaseAuthRepository.getInstance().getCustomUser();
+    }
 
 }

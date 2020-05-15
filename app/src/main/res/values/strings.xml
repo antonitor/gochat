@@ -29,10 +29,13 @@
     <string name="cd_showing_original_size_image">Showing original size image</string>
     <string name="share">Share</string>
     <string name="profile">Profile</string>
-    <string name="extra_userowner">owner-user</string>
     <string name="menu_logout">logout</string>
     <string name="title">GoChat!</string>
     <string name="extra_image_message">extra-message-image</string>
     <string name="send_to">SEND TO:</string>
     <string name="menu_invite">invite</string>
+    <string name="user_name">User name</string>
+    <string name="status_et">Status</string>
+    <string name="phone_number">Phone number</string>
+    <string name="profile_picture">Profile picture</string>
 </resources>

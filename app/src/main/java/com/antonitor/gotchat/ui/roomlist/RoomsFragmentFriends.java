@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.FragmentOwnRoomsBinding;
 import com.antonitor.gotchat.model.ChatRoom;
-import com.antonitor.gotchat.sync.FirebaseAuthRepository;
 import com.antonitor.gotchat.ui.chatroom.ChatActivity;
 import com.antonitor.gotchat.ui.newroom.AddNewRoomActivity;
 
@@ -60,8 +59,6 @@ public class RoomsFragmentFriends extends Fragment implements RoomListAdapter.On
     private void setUpAddFab(){
         mDataBinding.addFab.setOnClickListener(view -> {
             Intent newChatRoomIntent = new Intent(getActivity(), AddNewRoomActivity.class);
-            //TODO: Get Custom User From ViewModel for MVVM pattern
-            newChatRoomIntent.putExtra(getString(R.string.extra_userowner), FirebaseAuthRepository.getInstance().getCustomUser());
             getActivity().startActivity(newChatRoomIntent);
         });
     }
@@ -71,8 +68,7 @@ public class RoomsFragmentFriends extends Fragment implements RoomListAdapter.On
                 getActivity(),
                 RoomListAdapter.roomTypes.FRIENDS,
                 this,
-                //TODO: Get Custom User From ViewModel for MVVM pattern
-                FirebaseAuthRepository.getInstance().getCustomUser());
+                viewModel.getCustomUser());
         mDataBinding.ownRecyclerview.setAdapter(recyclerViewAdapter);
         viewModel.getFriendChatRooms().observe(getActivity(), new Observer<List<ChatRoom>>() {
             @Override

@@ -35,7 +35,7 @@ public class FirebaseAuthRepository {
                                 if (user != null) {
                                     customUser = user;
                                 } else {
-                                    customUser = new User(firebaseUser.getUid());
+                                    customUser = new User(firebaseUser.getUid(), firebaseUser.getEmail(), firebaseUser.getDisplayName());
                                     FirebaseDatabaseRepository.getInstance().getUserChatsReference().child(firebaseUser.getUid()).setValue(customUser);
                                 }
                                 authCallback.login();

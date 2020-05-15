@@ -17,6 +17,8 @@ public class Message implements Parcelable {
     private String roomID;
     private String text;
     private String author;
+    private String authorUUID;
+    private String thumbnail;
     private String localPhotoUrl;
     private String photoUrl;
     private Object timeStamp;
@@ -24,11 +26,13 @@ public class Message implements Parcelable {
     public Message() {
     }
 
-    public Message(String messageUUID, String roomId, String author, String text, String localPhotoUrl, String photoUrl) {
+    public Message(String messageUUID, String roomId, String author, String authorUUID, String text, String thumbnail, String localPhotoUrl, String photoUrl) {
         this.messageUUID = messageUUID;
         this.roomID = roomId;
         this.text = text;
         this.author = author;
+        this.authorUUID = authorUUID;
+        this.thumbnail = thumbnail;
         this.localPhotoUrl = localPhotoUrl;
         this.photoUrl = photoUrl;
         this.timeStamp = ServerValue.TIMESTAMP;
@@ -39,6 +43,8 @@ public class Message implements Parcelable {
         roomID = in.readString();
         text = in.readString();
         author = in.readString();
+        authorUUID = in.readString();
+        thumbnail = in.readString();
         localPhotoUrl = in.readString();
         photoUrl = in.readString();
     }
@@ -136,7 +142,25 @@ public class Message implements Parcelable {
         parcel.writeString(roomID);
         parcel.writeString(text);
         parcel.writeString(author);
+        parcel.writeString(authorUUID);
+        parcel.writeString(thumbnail);
         parcel.writeString(localPhotoUrl);
         parcel.writeString(photoUrl);
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
+    public String getAuthorUUID() {
+        return authorUUID;
+    }
+
+    public void setAuthorUUID(String authorUUID) {
+        this.authorUUID = authorUUID;
     }
 }

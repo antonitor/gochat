@@ -8,18 +8,30 @@ import java.util.HashMap;
 public class User implements Parcelable {
 
     private String UUID;
+    private String telephoneNumber;
+    private String userName;
+    private String userEmail;
+    private String cloudPhotoUrl;
+    private String localPhotoUrl;
     private HashMap<String, ChatRoom> ownChatRooms = new HashMap<>();
-    private HashMap<String, ChatRoom> followedChatRooms = new HashMap<>();
+    private HashMap<String, ChatRoom> subscribedChatRooms = new HashMap<>();
 
     public User() {
     }
 
-    public User(String uuid){
-        this.UUID = uuid;
+    public User(String UUID, String email, String userName) {
+        this.UUID = UUID;
+        this.userEmail = email;
+        this.userName = userName;
     }
 
     protected User(Parcel in) {
         UUID = in.readString();
+        telephoneNumber = in.readString();
+        userName = in.readString();
+        cloudPhotoUrl = in.readString();
+        localPhotoUrl = in.readString();
+        userEmail = in.readString();
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -34,22 +46,44 @@ public class User implements Parcelable {
         }
     };
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(UUID);
-    }
-
     public String getUUID() {
         return UUID;
     }
 
     public void setUUID(String UUID) {
         this.UUID = UUID;
+    }
+
+    public String getTelephoneNumber() {
+        return telephoneNumber;
+    }
+
+    public void setTelephoneNumber(String telephoneNumber) {
+        this.telephoneNumber = telephoneNumber;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getCloudPhotoUrl() {
+        return cloudPhotoUrl;
+    }
+
+    public void setCloudPhotoUrl(String cloudPhotoUrl) {
+        this.cloudPhotoUrl = cloudPhotoUrl;
+    }
+
+    public String getLocalPhotoUrl() {
+        return localPhotoUrl;
+    }
+
+    public void setLocalPhotoUrl(String localPhotoUrl) {
+        this.localPhotoUrl = localPhotoUrl;
     }
 
     public HashMap<String, ChatRoom> getOwnChatRooms() {
@@ -60,11 +94,34 @@ public class User implements Parcelable {
         this.ownChatRooms = ownChatRooms;
     }
 
-    public HashMap<String, ChatRoom> getFollowedChatRooms() {
-        return followedChatRooms;
+    public HashMap<String, ChatRoom> getSubscribedChatRooms() {
+        return subscribedChatRooms;
     }
 
-    public void setFollowedChatRooms(HashMap<String, ChatRoom> followedChatRooms) {
-        this.followedChatRooms = followedChatRooms;
+    public void setSubscribedChatRooms(HashMap<String, ChatRoom> subscribedChatRooms) {
+        this.subscribedChatRooms = subscribedChatRooms;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(UUID);
+        parcel.writeString(telephoneNumber);
+        parcel.writeString(userName);
+        parcel.writeString(cloudPhotoUrl);
+        parcel.writeString(localPhotoUrl);
+        parcel.writeString(userEmail);
     }
 }

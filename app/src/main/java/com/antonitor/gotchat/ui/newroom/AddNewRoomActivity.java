@@ -1,6 +1,7 @@
 package com.antonitor.gotchat.ui.newroom;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
@@ -8,9 +9,12 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Size;
 import android.view.View;
 import android.widget.Toast;
 
@@ -19,6 +23,8 @@ import com.antonitor.gotchat.databinding.ActivityAddNewRoomBinding;
 import com.antonitor.gotchat.model.User;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+
+import java.io.IOException;
 
 import static com.antonitor.gotchat.utilities.Utilities.bitmapByteArray;
 
@@ -50,8 +56,6 @@ public class AddNewRoomActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         dataBinding = DataBindingUtil.setContentView(this, R.layout.activity_add_new_room);
         viewModel = new ViewModelProvider(this).get(AddNewRoomViewModel.class);
-        User user = getIntent().getExtras().getParcelable(getString(R.string.extra_userowner));
-        viewModel.setOwner(user);
         viewModel.getIsLoading().observe(this, loadingObserver);
     }
 
@@ -72,6 +76,7 @@ public class AddNewRoomActivity extends AppCompatActivity {
         startActivityForResult(chooserIntent, RC_PHOTO_PICKER);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -80,10 +85,15 @@ public class AddNewRoomActivity extends AppCompatActivity {
             case RC_PHOTO_PICKER:
                 if (resultCode == RESULT_OK) {
                     viewModel.setLocalImageUri(data.getData());
-                    viewModel.setImageChosen();
-                    Glide.with(this)
-                            .load(viewModel.getLocalImageUri())
-                            .into(dataBinding.newChatroomIv);
+                    try {
+                        viewModel.setBitmap(MediaStore.Images.Media.getBitmap(getContentResolver(), viewModel.getLocalImageUri()));
+                        viewModel.setImageChosen();
+                        Glide.with(this)
+                                .load(viewModel.getLocalImageUri())
+                                .into(dataBinding.newChatroomIv);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
             case RC_CAMERA_ACTION:
@@ -109,7 +119,7 @@ public class AddNewRoomActivity extends AppCompatActivity {
             final String topic = dataBinding.newTextEt.getText().toString();
             if (viewModel.isImageChosen()) {
                 Observer<String> imageUrlObserver = imageURl -> {
-                    viewModel.newChatRoom(title, topic, imageURl, viewModel.getOwner());
+                    viewModel.newChatRoom(title, topic, imageURl);
                     finish();
                 };
                 viewModel.getImageUrl().observe(this, imageUrlObserver);

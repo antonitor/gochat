@@ -61,7 +61,6 @@ public class ChatActivity extends AppCompatActivity {
         adapter = new ChatAdapter(this);
         dataBinding.messageRecycleView.setAdapter(adapter);
 
-
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         dataBinding.messageRecycleView.setLayoutManager(layoutManager);
@@ -140,11 +139,13 @@ public class ChatActivity extends AppCompatActivity {
                     Message tempMsg = new Message(
                             null,
                             viewModel.getChatRoom().getId(),
-                            FirebaseAuthRepository.getInstance().getFirebaseUser().getPhoneNumber(),
+                            viewModel.getCustomUser().getUserName(),
+                            viewModel.getCustomUser().getUUID(),
+                            null,
                             null,
                             localImage.toString(),
                             null);
-                    Message message= FirebaseDatabaseRepository.getInstance().postMessage(tempMsg);
+                    FirebaseDatabaseRepository.getInstance().postMessage(tempMsg);
                     break;
                 }
             case RC_CAMERA_ACTION:
@@ -172,9 +173,9 @@ public class ChatActivity extends AppCompatActivity {
                 .replaceFirst("\\s+$", "")
                 .replaceFirst("^\\s+", "");
         String roomId = viewModel.getChatRoom().getId();
-        String user = FirebaseAuthRepository.getInstance().getFirebaseUser()
-                .getPhoneNumber();
-        Message message = new Message(null, roomId, user, text, null,null);
+        String user = viewModel.getCustomUser().getUserName();
+        String userUUID = viewModel.getCustomUser().getUUID();
+        Message message = new Message(null, roomId, user, userUUID, text,null, null,null);
         dataBinding.messageEditText.setText("");
         FirebaseDatabaseRepository.getInstance().postMessage(message);
     }

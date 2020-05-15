@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity  {
 
     private void startLoginScreen() {
         List<AuthUI.IdpConfig> providers =
-                Arrays.asList(new AuthUI.IdpConfig.PhoneBuilder().build());
+                Arrays.asList(new AuthUI.IdpConfig.EmailBuilder().build());
 
         startActivity(AuthUI.getInstance()
                 .createSignInIntentBuilder()

@@ -4,6 +4,8 @@ import android.util.Log;
 
 import com.antonitor.gotchat.model.ChatRoom;
 import com.antonitor.gotchat.model.Message;
+import com.antonitor.gotchat.model.User;
+import com.antonitor.gotchat.sync.FirebaseAuthRepository;
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
 
 import java.util.List;
@@ -55,5 +57,9 @@ public class ChatViewModel extends ViewModel {
 
     void setChatRoom(ChatRoom chatRoom) {
         this.chatRoom = chatRoom;
+    }
+
+    public User getCustomUser() {
+        return FirebaseAuthRepository.getInstance().getCustomUser();
     }
 }

@@ -16,6 +16,7 @@ import com.antonitor.gotchat.R;
 import com.antonitor.gotchat.databinding.MessageChatBinding;
 import com.antonitor.gotchat.model.Message;
 
+import com.antonitor.gotchat.sync.FirebaseAuthRepository;
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
 import com.antonitor.gotchat.sync.FirebaseStorageRepository;
 import com.antonitor.gotchat.ui.image.ImageActivity;
@@ -149,7 +150,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
             this.mMessage = message;
             dataBinding.setMessage(mMessage);
             dataBinding.executePendingBindings();
-            if (message.getLocalPhotoUrl() != null) {
+            if (message.getLocalPhotoUrl() != null && FirebaseAuthRepository.getInstance()
+                    .getCustomUser().getUUID() == message.getAuthorUUID()) {
                 dataBinding.messageTv.setVisibility(View.GONE);
                 dataBinding.photoImageView.setVisibility(View.VISIBLE);
                 Log.d(TAG, "----------- GLIDE LOADING LOCAL IMAGE " + getAdapterPosition() + " ----------");
@@ -163,7 +165,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
                 }
             } else if (message.getPhotoUrl() != null) {
                 Log.d(TAG, "----------- GLIDE LOADING CLOUD IMAGE " + getAdapterPosition() + " ---------");
-                //DOWNLOAD IMAGE
+                dataBinding.messageTv.setVisibility(View.GONE);
+                dataBinding.photoImageView.setVisibility(View.VISIBLE);
+                Glide.with(mContext)
+                        .load(message.getPhotoUrl())
+                        .centerCrop()
+                        .into(dataBinding.photoImageView);
             } else {
                 Log.d(TAG, "----------- NO IMAGE MESSAGE " + getAdapterPosition() + " -------------------");
                 dataBinding.photoImageView.setVisibility(View.GONE);

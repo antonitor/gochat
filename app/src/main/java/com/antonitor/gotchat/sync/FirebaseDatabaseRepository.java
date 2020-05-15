@@ -177,14 +177,14 @@ public class FirebaseDatabaseRepository {
 
     public void addFollowingChat(ChatRoom room) {
         User user = FirebaseAuthRepository.getInstance().getCustomUser();
-        user.getFollowedChatRooms().put(room.getId(), room);
+        user.getSubscribedChatRooms().put(room.getId(), room);
         userChatsReference.child(user.getUUID()).child(FirebaseContract.FOLLOWED_ROOMS_REF)
-                .setValue(user.getFollowedChatRooms());
+                .setValue(user.getSubscribedChatRooms());
     }
 
     public void unFollowChat(ChatRoom room) {
         User user = FirebaseAuthRepository.getInstance().getCustomUser();
-        user.getFollowedChatRooms().remove(room.getId());
+        user.getSubscribedChatRooms().remove(room.getId());
         userChatsReference.child(user.getUUID()).child(FirebaseContract.FOLLOWED_ROOMS_REF)
                 .child(room.getId()).removeValue();
     }
@@ -193,14 +193,14 @@ public class FirebaseDatabaseRepository {
         User user = FirebaseAuthRepository.getInstance().getCustomUser();
         chatroomsReference.child(roomID).removeValue((databaseError, databaseReference) -> {
             user.getOwnChatRooms().remove(roomID);
-            user.getFollowedChatRooms().remove(roomID);
+            user.getSubscribedChatRooms().remove(roomID);
             userChatsReference.child(user.getUUID()).child(FirebaseContract.OWN_ROOMS_REF).child(roomID).removeValue();
             userChatsReference.child(user.getUUID()).child(FirebaseContract.FOLLOWED_ROOMS_REF).child(roomID).removeValue();
             messageReference.child(roomID).removeValue();
         });
     }
 
-    public Message postMessage(Message message) {
+    public void postMessage(Message message) {
         messageReference.child(message.getRoomID()).push().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -214,7 +214,6 @@ public class FirebaseDatabaseRepository {
                 
             }
         });
-        return message;
     }
 
     public void updateMessage(Message message) {
