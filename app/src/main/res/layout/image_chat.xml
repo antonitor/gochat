@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:layout_marginStart="4dp"
+        android:background="@drawable/user_message_box"
+        android:elevation="1dp"
+        android:orientation="vertical"
+        android:paddingBottom="4dp"
+        android:paddingEnd="4dp"
+        android:paddingStart="12dp"
+        android:paddingTop="4dp">
+
+        <TextView
+            android:id="@+id/author_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:text="@{message.author}"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="Name" />
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/photoImageView"
+                android:layout_width="260dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/cd_image_send_by_user"
+                android:transitionName="image_chat_message" />
+
+            <ProgressBar
+                android:id="@+id/progress_bar_picture_upload"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="80dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/white"
+                android:max="100"
+                android:visibility="gone" />
+        </FrameLayout>
+        <!--app:chatImage="@{image}"-->
+    </LinearLayout>
+    <data>
+        <variable
+            name="message"
+            type="com.antonitor.gotchat.model.Message" />
+    </data>
+</layout>

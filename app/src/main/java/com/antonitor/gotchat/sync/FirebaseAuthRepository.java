@@ -3,8 +3,6 @@ package com.antonitor.gotchat.sync;
 import android.util.Log;
 
 import com.antonitor.gotchat.model.User;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -96,10 +94,6 @@ public class FirebaseAuthRepository {
             firebaseAuth.removeAuthStateListener(mAuthStateListener);
             setListeningFlag(false);
         }
-    }
-
-    public FirebaseUser getFirebaseUser() {
-        return firebaseUser;
     }
 
     public boolean isListeningFlag() {

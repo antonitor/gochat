@@ -141,11 +141,11 @@ public class ChatActivity extends AppCompatActivity {
                 if (resultCode == RESULT_OK) {
                     Uri localImage = data.getData();
                     try {
-                        Bitmap thumbnail = MediaStore.Images.Media.getBitmap(getContentResolver(), localImage);
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), localImage);
+                        Bitmap thumbnail = Utilities.getThumbnail(bitmap);
                         FirebaseStorageRepository.getInstance().uploadBitmap(thumbnail, FirebaseStorageRepository.getInstance().getMsgImgRef(), new FirebaseStorageRepository.UploadCallback() {
                             @Override
                             public void onComplete(String downloadUrl) {
-                                Log.d(LOG_TAG, " ------------PICKER MESSAGE WITH THUMBNAIL POSTED!! -------------");
                                 Message tempMsg = new Message(
                                         null,
                                         viewModel.getChatRoom().getId(),
@@ -174,7 +174,6 @@ public class ChatActivity extends AppCompatActivity {
                     FirebaseStorageRepository.getInstance().uploadBitmap(thumbnail, FirebaseStorageRepository.getInstance().getMsgImgRef(), new FirebaseStorageRepository.UploadCallback() {
                         @Override
                         public void onComplete(String downloadUrl) {
-                            Log.d(LOG_TAG, " ------------CAMERA MESSAGE WITH THUMBNAIL POSTED!! -------------");
                             Message tempMsg = new Message(
                                     null,
                                     viewModel.getChatRoom().getId(),

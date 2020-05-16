@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.antonitor.gotchat.R;
+import com.antonitor.gotchat.databinding.ImageChatBinding;
 import com.antonitor.gotchat.databinding.MessageChatBinding;
 import com.antonitor.gotchat.model.Message;
 
@@ -34,9 +35,10 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHolder> {
+public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final String TAG = "CHAT_ADAPTER";
+    private static final int TEXT_MESSAGE = 1985, IMAGE_MESSAGE = 2020;
     private Context mContext;
     private List<Message> messages;
     private final List<Message> selectedItems = new ArrayList<>();
@@ -76,24 +78,39 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
     }
 
     @Override
-    public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        MessageChatBinding dataBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
-                R.layout.message_chat, parent, false);
-        return new MessageViewHolder(dataBinding);
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType == TEXT_MESSAGE) {
+            MessageChatBinding dataBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
+                    R.layout.message_chat, parent, false);
+            return new MessageViewHolder(dataBinding);
+        } else {
+            ImageChatBinding imageChatBinding = DataBindingUtil.inflate(LayoutInflater.from(mContext),
+                    R.layout.image_chat, parent, false);
+            return new ImageViewHolder(imageChatBinding);
+        }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
-        holder.bind(messages.get(position));
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        switch (holder.getItemViewType()) {
+            case TEXT_MESSAGE:
+                ((MessageViewHolder)holder).bind(messages.get(position));
+                break;
+            case IMAGE_MESSAGE:
+                ((ImageViewHolder)holder).bind(messages.get(position));
+        }
+
     }
 
+    /*
     @Override
-    public void onViewRecycled(@NonNull MessageViewHolder holder) {
+    public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
         super.onViewRecycled(holder);
         Log.d(TAG, "------------ RECYCLED HOLDER " + holder.getAdapterPosition() + " -------------------");
         Glide.with(holder.itemView.getContext())
                 .clear(((MessageViewHolder) holder).dataBinding.photoImageView);
     }
+    */
 
     @Override
     public int getItemCount() {
@@ -137,6 +154,15 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
         }
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        if (messages.get(position).getThumbnail() == null) {
+            return TEXT_MESSAGE;
+        } else {
+            return IMAGE_MESSAGE;
+        }
+    }
+
     class MessageViewHolder extends RecyclerView.ViewHolder {
         final MessageChatBinding dataBinding;
         Message mMessage;
@@ -146,28 +172,83 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
             this.dataBinding = dataBinding;
         }
 
+
+        void bind(Message message) {
+            this.mMessage = message;
+            dataBinding.setMessage(mMessage);
+            dataBinding.executePendingBindings();
+            Log.d(TAG, "----------- NO IMAGE MESSAGE " + getAdapterPosition() + " -------------------");
+            dataBinding.authorTv.setOnClickListener(view -> {
+                if (multiSelect) {
+                    //uncomment to enable multiple selection
+                    //selectItem(message.getId());
+                } else {
+                    selectItem();
+                }
+            });
+            update();
+        }
+
+        void selectItem() {
+            if (multiSelect) {
+                if (selectedItems.contains(mMessage)) {
+                    selectedItems.remove(mMessage);
+                    dataBinding.authorTv.setBackgroundColor(Color.WHITE);
+                    //dataBinding.authorTv.getPaint().setUnderlineText(false);
+                } else {
+                    selectedItems.add(mMessage);
+                    //dataBinding.authorTv.getPaint().setUnderlineText(true);
+                    dataBinding.authorTv.setBackgroundColor(Color.YELLOW);
+                }
+            }
+        }
+
+        void update() {
+            if (selectedItems.contains(mMessage)) {
+                //dataBinding.authorTv.getPaint().setUnderlineText(true);
+                dataBinding.authorTv.setBackgroundColor(Color.YELLOW);
+                //itemView.setBackgroundColor(Color.LTGRAY);
+            } else {
+                //dataBinding.authorTv.getPaint().setUnderlineText(false);
+                dataBinding.authorTv.setBackgroundColor(Color.WHITE);
+            }
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    ((AppCompatActivity) view.getContext()).startSupportActionMode(actionModeCallbacks);
+                    selectItem();
+                    return true;
+                }
+            });
+        }
+    }
+
+    class ImageViewHolder extends RecyclerView.ViewHolder {
+
+        final ImageChatBinding dataBinding;
+        Message mMessage;
+
+        ImageViewHolder(ImageChatBinding dataBinding) {
+            super(dataBinding.getRoot());
+            this.dataBinding = dataBinding;
+        }
+
         void bind(Message message) {
             this.mMessage = message;
             dataBinding.setMessage(mMessage);
             dataBinding.executePendingBindings();
 
-            if (message.getThumbnail()!= null) {
-                dataBinding.messageTv.setVisibility(View.GONE);
-                Glide.with(mContext)
-                        .load(message.getThumbnail())
-                        .centerCrop()
-                        .into(dataBinding.photoImageView);
-            } else {
-                Log.d(TAG, "----------- NO IMAGE MESSAGE " + getAdapterPosition() + " -------------------");
-                dataBinding.photoImageView.setVisibility(View.GONE);
-                dataBinding.messageTv.setVisibility(View.VISIBLE);
-            }
-
+            Glide.with(mContext)
+                    .load(message.getThumbnail())
+                    .placeholder(R.drawable.noimage)
+                    .centerCrop()
+                    .into(dataBinding.photoImageView);
+            Log.d(TAG, "----------- YES IMAGE MESSAGE " + getAdapterPosition() + " -------------------");
 
             if (message.getLocalPhotoUrl() != null && FirebaseAuthRepository.getInstance()
-                    .getCustomUser().getUUID() == message.getAuthorUUID() && message.getPhotoUrl() == null){
-                    dataBinding.progressBarPictureUpload.setVisibility(View.VISIBLE);
-                    uploadImage();
+                    .getCustomUser().getUUID() == message.getAuthorUUID() && message.getPhotoUrl() == null) {
+                dataBinding.progressBarPictureUpload.setVisibility(View.VISIBLE);
+                uploadImage();
             }
 
             dataBinding.authorTv.setOnClickListener(view -> {
@@ -182,7 +263,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
                 Intent intent = new Intent(view.getContext(), ImageActivity.class);
                 intent.putExtra(mContext.getString(R.string.extra_image_message), message);
                 ActivityOptionsCompat options = ActivityOptionsCompat.
-                        makeSceneTransitionAnimation((Activity)mContext, dataBinding.photoImageView, "image_chat_message");
+                        makeSceneTransitionAnimation((Activity) mContext, dataBinding.photoImageView, "image_chat_message");
                 view.getContext().startActivity(intent, options.toBundle());
             });
 
@@ -246,4 +327,5 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
                     });
         }
     }
+
 }
