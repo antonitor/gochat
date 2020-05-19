@@ -12,7 +12,6 @@ In order to get this app running must create a Firebase project, se more: https:
 
 - Material design
 - ViewModel - lifeData
-- ButterKnife
 - Firebase Realtime Database
 - Firebase Auth
 
