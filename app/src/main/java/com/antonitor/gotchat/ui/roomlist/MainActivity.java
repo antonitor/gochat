@@ -9,16 +9,20 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.antonitor.gotchat.R;
+import com.antonitor.gotchat.ui.newroom.AddNewRoomActivity;
 import com.antonitor.gotchat.utilities.Utilities;
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.google.GoogleEmojiProvider;
@@ -34,6 +38,8 @@ public class MainActivity extends AppCompatActivity  {
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
     };
+    PagerAdapter pagerAdapter;
+    FloatingActionButton fab;
     private MainViewModel mainViewModel;
     private Observer<Boolean> loginObserver = new Observer<Boolean>() {
         @Override
@@ -56,6 +62,7 @@ public class MainActivity extends AppCompatActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        fab = findViewById(R.id.add_fab);
         EmojiManager.install(new GoogleEmojiProvider());
 
         //Setup ViewModel
@@ -115,11 +122,38 @@ public class MainActivity extends AppCompatActivity  {
 
     private void startFragmentPageAdapter() {
         ViewPager viewPager = findViewById(R.id.pager);
-        PagerAdapter pagerAdapter = new MainPageAdapter(getSupportFragmentManager(),
+        pagerAdapter = new MainPageAdapter(getSupportFragmentManager(),
                 FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         TabLayout tabLayout = findViewById(R.id.sliding_tabs);
         tabLayout.setupWithViewPager(viewPager);
         viewPager.setAdapter(pagerAdapter);
+        viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+
+                switch (position) {
+                    case 0:
+                        fab.setOnClickListener(view -> {
+
+                        });
+                        fab.setImageResource(R.drawable.ic_search_black_24dp);
+                        fab.show();
+                        break;
+                    case 1:
+                        fab.hide();
+                        break;
+                    case 2:
+                        fab.setOnClickListener(view -> startActivity(new Intent(
+                                MainActivity.this, AddNewRoomActivity.class)));
+                        fab.setImageResource(R.drawable.ic_add_black_24dp);
+                        fab.show();
+                        break;
+                    default:
+                        fab.hide();
+                        break;
+                }
+            }
+        });
     }
 
     @Override

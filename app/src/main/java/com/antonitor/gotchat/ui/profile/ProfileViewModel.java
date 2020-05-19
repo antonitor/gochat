@@ -36,9 +36,9 @@ public class ProfileViewModel extends ViewModel {
     public void setUserUUID(String userUUID) {
         this.userUUID = userUUID;
     }
-    
 
-    public void fetchtUser(String userUUID){
+
+    public void fetchUser(String userUUID){
         FirebaseDatabaseRepository.getInstance().getUser(userUUID, new FirebaseDatabaseRepository.GetUserCallback() {
             @Override
             public void onSuccess(User user) {

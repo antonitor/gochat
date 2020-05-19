@@ -71,7 +71,7 @@ public class ProfileActivity extends AppCompatActivity {
                             Toast.LENGTH_LONG).show();
             }
         });
-        viewModel.fetchtUser(viewModel.getUserUUID());
+        viewModel.fetchUser(viewModel.getUserUUID());
     }
 
     public void okClicked(View view) {

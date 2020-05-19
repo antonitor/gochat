@@ -1,22 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.antonitor.gotchat.ui.roomlist.MainActivity"
-    android:orientation="vertical">
+    tools:context="com.antonitor.gotchat.ui.roomlist.MainActivity">
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/sliding_tabs"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        app:tabMode="fixed" />
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/sliding_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            app:tabMode="fixed" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_fab"
+        app:layout_anchor="@id/pager"
+        app:layout_anchorGravity="bottom|right|end"
+        android:layout_margin="28dp"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:tint="@color/white"
+        app:srcCompat="@drawable/ic_search_black_24dp"
+        app:fabSize="normal"/>
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/pager"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"/>
 
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -57,10 +57,12 @@ public class RoomsFragmentFriends extends Fragment implements RoomListAdapter.On
     }
 
     private void setUpAddFab(){
+        /*
         mDataBinding.addFab.setOnClickListener(view -> {
             Intent newChatRoomIntent = new Intent(getActivity(), AddNewRoomActivity.class);
             getActivity().startActivity(newChatRoomIntent);
         });
+         */
     }
 
     private void setUpRecyclerView(){
