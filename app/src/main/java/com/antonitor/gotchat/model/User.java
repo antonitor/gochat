@@ -2,8 +2,15 @@ package com.antonitor.gotchat.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.widget.ImageView;
+
+import com.antonitor.gotchat.R;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.HashMap;
+
+import androidx.databinding.BindingAdapter;
 
 public class User implements Parcelable {
 
@@ -13,6 +20,7 @@ public class User implements Parcelable {
     private String userEmail;
     private String cloudPhotoUrl;
     private String localPhotoUrl;
+    private String status;
     private HashMap<String, ChatRoom> ownChatRooms = new HashMap<>();
     private HashMap<String, ChatRoom> subscribedChatRooms = new HashMap<>();
 
@@ -32,6 +40,7 @@ public class User implements Parcelable {
         cloudPhotoUrl = in.readString();
         localPhotoUrl = in.readString();
         userEmail = in.readString();
+        status = in.readString();
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -123,5 +132,22 @@ public class User implements Parcelable {
         parcel.writeString(cloudPhotoUrl);
         parcel.writeString(localPhotoUrl);
         parcel.writeString(userEmail);
+        parcel.writeString(status);
+    }
+
+    @BindingAdapter("avatar")
+    public static void loadImage(ImageView view, String cloudPhotoUrl) {
+        Glide.with(view.getContext())
+                .load(cloudPhotoUrl).apply(new RequestOptions().circleCrop())
+                .placeholder(R.drawable.noimage)
+                .into(view);
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable name="user" type="com.antonitor.gotchat.model.User"/>
+        <variable name="image" type="String"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:id="@+id/progress_bar_avatar_upload"
+            android:layout_width="50dp"
+            android:layout_height="5dp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/profile_pricture"
+            app:layout_constraintEnd_toEndOf="@+id/profile_pricture"
+            app:layout_constraintStart_toStartOf="@+id/profile_pricture"
+            app:layout_constraintTop_toTopOf="@+id/profile_pricture" />
+
+        <ImageView
+            android:id="@+id/profile_pricture"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="32dp"
+            android:src="@drawable/noimage"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="@string/profile_picture"
+            app:avatar="@{user.cloudPhotoUrl}"/>
+
+
+
+        <ImageButton
+            android:id="@+id/add_picture_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/upload_picture"
+            android:onClick="selectPicture"
+            app:layout_constraintBottom_toTopOf="@+id/take_picture_button"
+            app:layout_constraintEnd_toEndOf="@+id/take_picture_button"
+            app:srcCompat="@drawable/ic_photo_black_24dp"
+            android:backgroundTint="@color/colorPrimaryDark" />
+
+        <ImageButton
+            android:id="@+id/take_picture_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/take_a_new_picture"
+            android:onClick="takePicture"
+            app:layout_constraintBottom_toBottomOf="@+id/profile_pricture"
+            app:layout_constraintEnd_toEndOf="@+id/profile_pricture"
+            app:srcCompat="@drawable/ic_add_a_photo_black_24dp"
+            android:backgroundTint="@color/colorPrimaryDark"/>
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            app:layout_constraintEnd_toEndOf="@+id/profile_pricture"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/profile_pricture"
+            app:layout_constraintTop_toBottomOf="@+id/profile_pricture">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/user_name_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="@string/user_name"
+                android:inputType="textFilter"
+                android:text="@{user.userName}"
+                android:maxLength="36"
+                android:maxLines="1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:layout_constraintEnd_toEndOf="@+id/textInputLayout"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/textInputLayout"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/phone_numbeer_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="@string/phone_number"
+                android:text="@{user.telephoneNumber}"
+                android:inputType="text"
+                android:lines="1"
+                android:maxLength="20"
+                android:enabled="false"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:layout_constraintEnd_toEndOf="@+id/textInputLayout"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/textInputLayout2"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout2">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/status_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="@string/status_et"
+                android:inputType="text"
+                android:text="@{user.status}"
+                android:lines="1"
+                android:maxLength="20"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/apply_profile_changes"
+            android:onClick="okClicked"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:src="@drawable/ic_check_white_24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout3" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

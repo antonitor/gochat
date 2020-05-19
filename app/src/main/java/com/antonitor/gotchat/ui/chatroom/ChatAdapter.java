@@ -21,6 +21,7 @@ import com.antonitor.gotchat.sync.FirebaseAuthRepository;
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
 import com.antonitor.gotchat.sync.FirebaseStorageRepository;
 import com.antonitor.gotchat.ui.image.ImageActivity;
+import com.antonitor.gotchat.ui.profile.ProfileActivity;
 import com.bumptech.glide.Glide;
 
 
@@ -59,7 +60,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             for (Message message : selectedItems) {
-
+                Intent intent = new Intent(mContext, ProfileActivity.class);
+                intent.putExtra(mContext.getResources().getString(R.string.extra_user_uuid), message.getAuthorUUID());
+                mContext.startActivity(intent);
             }
             mode.finish();
             return true;

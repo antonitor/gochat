@@ -1,6 +1,7 @@
 package com.antonitor.gotchat.sync;
 
 class FirebaseContract {
+    static final String USER_IMAGE_REF = "user_image";
     static final String CHAT_ROOMS_REF = "chatrooms";
     static final String MESSAGES_REF = "messages";
     static final String USER_REF = "users";

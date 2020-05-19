@@ -38,4 +38,5 @@
     <string name="status_et">Status</string>
     <string name="phone_number">Phone number</string>
     <string name="profile_picture">Profile picture</string>
+    <string name="extra_user_uuid">extra_user_uuid</string>
 </resources>

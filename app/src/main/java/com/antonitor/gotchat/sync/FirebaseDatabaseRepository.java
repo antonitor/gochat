@@ -220,6 +220,38 @@ public class FirebaseDatabaseRepository {
         messageReference.child(message.getRoomID()).child(message.getMessageUUID()).setValue(message);
     }
 
+
+    public interface GetUserCallback {
+        void onSuccess(User user);
+        void onError(Exception e);
+    }
+
+    public void getUser(String userUUID, GetUserCallback callback) {
+        userChatsReference.child(userUUID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.d(LOG_TAG, "------------ TRYING TO FETCH USER " + userUUID);
+                User user = dataSnapshot.getValue(User.class);
+                if (user != null) {
+                    Log.d(LOG_TAG, "------------ USER " + user.getUserName() + " FETCHED --------------");
+                    callback.onSuccess(dataSnapshot.getValue(User.class));
+                } else {
+                    dataSnapshot.toString();
+                    Log.d(LOG_TAG, "------------ USER NULL FETCHED --------------" + dataSnapshot.toString());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                callback.onError(new Exception(databaseError.getMessage()));
+            }
+        });
+    }
+
+    public void updateUser(User user) {
+        userChatsReference.child(user.getUUID()).setValue(user);
+    }
+
     public DatabaseReference getUserChatsReference() {
         return userChatsReference;
     }

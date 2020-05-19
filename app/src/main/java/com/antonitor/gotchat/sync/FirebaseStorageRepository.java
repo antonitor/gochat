@@ -26,6 +26,7 @@ public class FirebaseStorageRepository {
     private static FirebaseStorageRepository sInstance;
     private final StorageReference roomImgRef;
     private final StorageReference msgImgRef;
+    private final StorageReference userImgRef;
 
     public interface UploadCallback {
         void onComplete(String downloadUrl);
@@ -40,6 +41,7 @@ public class FirebaseStorageRepository {
         FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
         roomImgRef = firebaseStorage.getReference(FirebaseContract.ROOM_IMAGE_REF);
         msgImgRef = firebaseStorage.getReference(FirebaseContract.MESSAGE_IMAGE_REF);
+        userImgRef = firebaseStorage.getReference(FirebaseContract.USER_IMAGE_REF);
     }
 
     public static FirebaseStorageRepository getInstance() {
@@ -57,6 +59,10 @@ public class FirebaseStorageRepository {
 
     public StorageReference getMsgImgRef() {
         return msgImgRef;
+    }
+
+    public StorageReference getUserImgRef() {
+        return userImgRef;
     }
 
     public void uploadBitmap(Bitmap bitmap, StorageReference reference, UploadCallback callback) {
