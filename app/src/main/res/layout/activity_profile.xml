@@ -101,7 +101,6 @@
                 android:inputType="text"
                 android:lines="1"
                 android:maxLength="20"
-                android:enabled="false"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
         </com.google.android.material.textfield.TextInputLayout>
 

@@ -30,7 +30,7 @@ public class ImageActivity extends AppCompatActivity {
         message = getIntent().getExtras().getParcelable(getString(R.string.extra_image_message));
 
         Glide.with(this)
-                .load(message.getLocalPhotoUrl())
+                .load(message.getPhotoUrl())
                 .into(dataBinding.imageFullsize);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }

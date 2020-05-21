@@ -39,4 +39,8 @@
     <string name="phone_number">Phone number</string>
     <string name="profile_picture">Profile picture</string>
     <string name="extra_user_uuid">extra_user_uuid</string>
+    <string name="widget_username_text_">User Name</string>
+    <string name="widget_phone_number_text">Phone Number</string>
+    <string name="widget_user_status_text">User Status</string>
+    <string name="widget_status">Status: </string>
 </resources>

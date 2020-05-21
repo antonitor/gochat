@@ -150,4 +150,5 @@ public class User implements Parcelable {
     public void setStatus(String status) {
         this.status = status;
     }
+
 }
