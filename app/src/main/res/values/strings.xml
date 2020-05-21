@@ -43,4 +43,5 @@
     <string name="widget_phone_number_text">Phone Number</string>
     <string name="widget_user_status_text">User Status</string>
     <string name="widget_status">Status: </string>
+    <string name="menu_profile">Profile</string>
 </resources>

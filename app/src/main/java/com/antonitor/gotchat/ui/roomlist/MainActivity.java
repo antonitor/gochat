@@ -19,7 +19,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.antonitor.gotchat.R;
+import com.antonitor.gotchat.sync.FirebaseAuthRepository;
 import com.antonitor.gotchat.ui.newroom.AddNewRoomActivity;
+import com.antonitor.gotchat.ui.profile.ProfileActivity;
 import com.antonitor.gotchat.utilities.Utilities;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -30,7 +32,7 @@ import com.vanniktech.emoji.google.GoogleEmojiProvider;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "MAIN_ACTIVITY";
     private static final int PERMISSIONS_REQ = 123;
@@ -80,8 +82,7 @@ public class MainActivity extends AppCompatActivity  {
     }
 
 
-
-    public void requestPermissions(){
+    public void requestPermissions() {
         if (Utilities.hasPermissions(this, STORAGE_PERMISSIONS)) {
             startFragmentPageAdapter();
         } else {
@@ -158,9 +159,19 @@ public class MainActivity extends AppCompatActivity  {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.menu_singout)
-            mainViewModel.singOut();
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case R.id.menu_singout:
+                mainViewModel.singOut();
+                finish();
+                return true;
+            case R.id.menu_profile:
+                Intent intent = new Intent(this, ProfileActivity.class);
+                intent.putExtra(getResources().getString(R.string.extra_user_uuid), FirebaseAuthRepository.getInstance().getCustomUser().getUUID());
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
 

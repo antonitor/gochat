@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.antonitor.gotchat.model.User;
+import com.antonitor.gotchat.sync.FirebaseAuthRepository;
 import com.antonitor.gotchat.sync.FirebaseDatabaseRepository;
 import com.antonitor.gotchat.sync.FirebaseStorageRepository;
 import com.antonitor.gotchat.utilities.Utilities;
@@ -54,6 +55,11 @@ public class ProfileViewModel extends ViewModel {
 
     public void updateUser(User user){
         FirebaseDatabaseRepository.getInstance().updateUser(user);
+        if (user.getUUID() == FirebaseAuthRepository.getInstance().getCustomUser().getUUID()) {
+            FirebaseAuthRepository.getInstance().getCustomUser().setUserName(user.getUserName());
+            FirebaseAuthRepository.getInstance().getCustomUser().setTelephoneNumber(user.getTelephoneNumber());
+            FirebaseAuthRepository.getInstance().getCustomUser().setStatus(user.getStatus());
+        }
     }
 
     void uploadImage(Bitmap bitmap) {
